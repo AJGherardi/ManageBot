@@ -6,10 +6,7 @@ import (
 	dgo "github.com/bwmarrin/discordgo"
 )
 
-var (
-	botToken = "ODAwNDkxNTIzNzYxNTA0Mjg2.YAS50w.h5epsAeVzfbOjFlB1HiobpbhGSM"
-	guildID  = "799794515443318814"
-)
+// botToken and guildID must be added to consts.go
 
 func main() {
 	// Creates a new client object
@@ -42,14 +39,24 @@ func commandHandler(client *dgo.Session) func(s *dgo.Session, i *dgo.Interaction
 		// Wait a sec
 		time.Sleep(1 * time.Second)
 		// Match command to handler function
-
-		// Get user from parms
-		userID := i.Interaction.Data.Options[0].Value.(string)
-		user, _ := client.User(userID)
-		s.InteractionResponseEdit("", i.Interaction, &dgo.WebhookEdit{
-			Content: user.Mention() + " This is you final warning for " + i.Interaction.Data.Options[1].Value.(string),
-		})
+		switch i.Interaction.Data.Name {
+		case "warn":
+			handleWarn(
+				i.Interaction.Data.Options[0].Value.(string),
+				i.Interaction.Data.Options[1].Value.(string),
+				i,
+				s,
+			)
+		}
 	}
+}
+
+func handleWarn(userID, violation string, i *dgo.InteractionCreate, s *dgo.Session) {
+	// Get user from parms
+	user, _ := s.User(userID)
+	s.InteractionResponseEdit("", i.Interaction, &dgo.WebhookEdit{
+		Content: user.Mention() + " This is you final warning for " + violation,
+	})
 }
 
 func regesterCommands(client *dgo.Session) {
