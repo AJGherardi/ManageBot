@@ -7,39 +7,52 @@ import (
 )
 
 var (
-	botToken = "ODAwNDkxNTIzNzYxNTA0Mjg2.YAS50w.NPCoNQslj3u-fPlIpEp_rQiEFGE"
+	botToken = "ODAwNDkxNTIzNzYxNTA0Mjg2.YAS50w.h5epsAeVzfbOjFlB1HiobpbhGSM"
 	guildID  = "799794515443318814"
 )
 
-// Execution starts here
 func main() {
 	// Creates a new client object
 	client, _ := dgo.New("Bot " + botToken)
 	// Regesters a event handeler for when the command is called
-	client.AddHandler(func(s *dgo.Session, i *dgo.InteractionCreate) {
+	client.AddHandler(commandHandler(client))
+	// Opens the connection
+	client.Open()
+	// Remove all commands
+	deleteAllCommands(client)
+	// Regesters the commands
+	regesterCommands(client)
+	// Keep the app runing
+	for {
+	}
+}
+
+func commandHandler(client *dgo.Session) func(s *dgo.Session, i *dgo.InteractionCreate) {
+	return func(s *dgo.Session, i *dgo.InteractionCreate) {
 		// Makes a reaponse
 		responseData := &dgo.InteractionApplicationCommandResponseData{
 			TTS:     false,
-			Content: "Warning",
+			Content: "Pls wait",
 		}
 		// Sends the inital response
 		s.InteractionRespond(i.Interaction, &dgo.InteractionResponse{
 			Type: dgo.InteractionResponseChannelMessage,
 			Data: responseData,
 		})
+		// Wait a sec
 		time.Sleep(1 * time.Second)
+		// Match command to handler function
+
 		// Get user from parms
 		userID := i.Interaction.Data.Options[0].Value.(string)
 		user, _ := client.User(userID)
 		s.InteractionResponseEdit("", i.Interaction, &dgo.WebhookEdit{
-			Content: "**" + user.Username + "** This is you final warning for " + i.Interaction.Data.Options[1].Value.(string),
+			Content: user.Mention() + " This is you final warning for " + i.Interaction.Data.Options[1].Value.(string),
 		})
-	})
-	// Opens the connection
-	client.Open()
-	// Remove all commands
-	deleteAllCommands(client)
-	// Regesters the command
+	}
+}
+
+func regesterCommands(client *dgo.Session) {
 	client.ApplicationCommandCreate(
 		"",
 		&dgo.ApplicationCommand{
@@ -86,6 +99,18 @@ func main() {
 							Name:  "Obsessive pinging",
 							Value: "Obsessive Pinging",
 						},
+						{
+							Name:  "Hate Speech",
+							Value: "Hate Speech",
+						},
+						{
+							Name:  "Threatening People",
+							Value: "Threatening People",
+						},
+						{
+							Name:  "Sending Dangerous Links",
+							Value: "Sending Dangerous Links",
+						},
 					},
 					Required: true,
 				},
@@ -93,14 +118,7 @@ func main() {
 		},
 		guildID,
 	)
-	// Keep the app runing
-	for {
-
-	}
-	// if err := client.Close(); err != nil {
-	// 	log.Fatal(err)
-	// }
-} // Execution ends here
+}
 
 func deleteAllCommands(client *dgo.Session) {
 	apps, _ := client.Applications()
@@ -109,7 +127,6 @@ func deleteAllCommands(client *dgo.Session) {
 		for _, cmd := range cmds {
 			client.ApplicationCommandDelete(cmd.ApplicationID, cmd.ID, guildID)
 		}
-
 	}
 	cmds, _ := client.ApplicationCommands("", guildID)
 	for _, cmd := range cmds {
