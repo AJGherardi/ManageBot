@@ -37,8 +37,8 @@ func commandHandler(client *dgo.Session) func(s *dgo.Session, i *dgo.Interaction
 			Type: dgo.InteractionResponseChannelMessage,
 			Data: responseData,
 		})
-		// Wait a sec
-		time.Sleep(1 * time.Second)
+		// Wait a half sec
+		time.Sleep(500 * time.Millisecond)
 		// Match command to handler function
 		switch i.Interaction.Data.Name {
 		case "warn":
