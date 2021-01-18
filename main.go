@@ -138,6 +138,18 @@ func regesterCommands(client *dgo.Session) {
 							Name:  "Sending Dangerous Links",
 							Value: "Sending Dangerous Links",
 						},
+						{
+							Name:  "Phishing or viruses",
+							Value: "Phishing or viruses",
+						},
+						{
+							Name:  "Rule break/misconduct",
+							Value: "Rule break/misconduct",
+						},
+						{
+							Name:  "Under 13",
+							Value: "Under 13",
+						},
 					},
 					Required: true,
 				},
