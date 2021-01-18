@@ -52,8 +52,26 @@ func commandHandler(client *dgo.Session) func(s *dgo.Session, i *dgo.Interaction
 				i,
 				s,
 			)
+
+		case "kick":
+			handelKick(
+				i.Interaction.Data.Options[0].Value.(string),
+				i,
+				s,
+			)
 		}
+
 	}
+}
+func handelKick(userID string, i *dgo.InteractionCreate, s *dgo.Session) {
+	// Get user from parms
+	user, _ := s.User(userID)
+	// Kick user
+	s.GuildMemberDelete(i.GuildID, user.ID)
+	s.InteractionResponseEdit("", i.Interaction, &dgo.WebhookEdit{
+		Content: "Kicked " + user.Username,
+	})
+
 }
 
 func handleRole(i *dgo.InteractionCreate, s *dgo.Session) {
