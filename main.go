@@ -201,7 +201,22 @@ func regesterCommands(client *dgo.Session) {
 		},
 		guildID,
 	)
-
+	client.ApplicationCommandCreate(
+		"",
+		&dgo.ApplicationCommand{
+			Name:        "Kick",
+			Description: "Kicks a user",
+			Options: []*dgo.ApplicationCommandOption{
+				{
+					Type:        dgo.ApplicationCommandOptionUser,
+					Name:        "User",
+					Description: "User to kick",
+					Required:    true,
+				},
+			},
+		},
+		guildID,
+	)
 }
 
 func deleteAllCommands(client *dgo.Session) {
