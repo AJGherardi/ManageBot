@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	dgo "github.com/bwmarrin/discordgo"
@@ -47,11 +48,30 @@ func commandHandler(client *dgo.Session) func(s *dgo.Session, i *dgo.Interaction
 				i,
 				s,
 			)
+		case "addrole":
+			handleAddRole(
+				i.Interaction.Data.Options[0].Value.(string),
+				i.Interaction.Data.Options[1].Value.(string),
+				i,
+				s,
+			)
 		}
 	}
 }
 
+func handleAddRole(userID, roleID string, i *dgo.InteractionCreate, s *dgo.Session) {
+	fmt.Println(i.Interaction.Member.Roles)
+	// Get user from parms
+	user, _ := s.User(userID)
+	// Get role from parms
+	role, _ := s.State.Role(i.GuildID, roleID)
+	s.InteractionResponseEdit("", i.Interaction, &dgo.WebhookEdit{
+		Content: "Added role " + role.Mention() + " to " + user.Mention(),
+	})
+}
+
 func handleWarn(userID, violation string, i *dgo.InteractionCreate, s *dgo.Session) {
+	fmt.Println(i.Interaction.Member.Roles)
 	// Get user from parms
 	user, _ := s.User(userID)
 	s.InteractionResponseEdit("", i.Interaction, &dgo.WebhookEdit{
@@ -125,6 +145,29 @@ func regesterCommands(client *dgo.Session) {
 		},
 		guildID,
 	)
+	client.ApplicationCommandCreate(
+		"",
+		&dgo.ApplicationCommand{
+			Name:        "AddRole",
+			Description: "Adds a role to a user",
+			Options: []*dgo.ApplicationCommandOption{
+				{
+					Type:        dgo.ApplicationCommandOptionUser,
+					Name:        "User",
+					Description: "User to add role to",
+					Required:    true,
+				},
+				{
+					Type:        dgo.ApplicationCommandOptionRole,
+					Name:        "Role",
+					Description: "Role to add",
+					Required:    true,
+				},
+			},
+		},
+		guildID,
+	)
+
 }
 
 func deleteAllCommands(client *dgo.Session) {
