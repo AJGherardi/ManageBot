@@ -167,6 +167,28 @@ func regesterCommands(client *dgo.Session) {
 		},
 		guildID,
 	)
+	client.ApplicationCommandCreate(
+		"",
+		&dgo.ApplicationCommand{
+			Name:        "Remove Role",
+			Description: "Revokes a current role form a user",
+			Options: []*dgo.ApplicationCommandOption{
+				{
+					Type:        dgo.ApplicationCommandOptionUser,
+					Name:        "User",
+					Description: "User to remove role from",
+					Required:    true,
+				},
+				{
+					Type:        dgo.ApplicationCommandOptionRole,
+					Name:        "Role",
+					Description: "Role to remove",
+					Required:    true,
+				},
+			},
+		},
+		guildID,
+	)
 
 }
 
