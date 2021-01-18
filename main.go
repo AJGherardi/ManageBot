@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"time"
 
 	dgo "github.com/bwmarrin/discordgo"
@@ -48,10 +47,8 @@ func commandHandler(client *dgo.Session) func(s *dgo.Session, i *dgo.Interaction
 				i,
 				s,
 			)
-		case "addrole":
-			handleAddRole(
-				i.Interaction.Data.Options[0].Value.(string),
-				i.Interaction.Data.Options[1].Value.(string),
+		case "role":
+			handleRole(
 				i,
 				s,
 			)
@@ -59,19 +56,83 @@ func commandHandler(client *dgo.Session) func(s *dgo.Session, i *dgo.Interaction
 	}
 }
 
-func handleAddRole(userID, roleID string, i *dgo.InteractionCreate, s *dgo.Session) {
-	fmt.Println(i.Interaction.Member.Roles)
+func handleRole(i *dgo.InteractionCreate, s *dgo.Session) {
+	for _, option := range i.Interaction.Data.Options {
+		switch option.Name {
+		case "assign":
+			handleAssignRole(
+				option.Options[0].Value.(string),
+				option.Options[1].Value.(string),
+				i,
+				s,
+			)
+		case "revoke":
+			handleRevokeRole(
+				option.Options[0].Value.(string),
+				option.Options[1].Value.(string),
+				i,
+				s,
+			)
+		case "create":
+			handleCreateRole(
+				option.Options[0].Value.(string),
+				i,
+				s,
+			)
+		case "delete":
+			handleDeleteRole(
+				option.Options[0].Value.(string),
+				i,
+				s,
+			)
+		}
+	}
+}
+
+func handleAssignRole(userID, roleID string, i *dgo.InteractionCreate, s *dgo.Session) {
 	// Get user from parms
 	user, _ := s.User(userID)
 	// Get role from parms
 	role, _ := s.State.Role(i.GuildID, roleID)
+	// Assign role to user
+	s.GuildMemberRoleAdd(i.GuildID, user.ID, role.ID)
 	s.InteractionResponseEdit("", i.Interaction, &dgo.WebhookEdit{
 		Content: "Added role " + role.Mention() + " to " + user.Mention(),
 	})
 }
 
+func handleRevokeRole(userID, roleID string, i *dgo.InteractionCreate, s *dgo.Session) {
+	// Get user from parms
+	user, _ := s.User(userID)
+	// Get role from parms
+	role, _ := s.State.Role(i.GuildID, roleID)
+	// Removed role from user
+	s.GuildMemberRoleRemove(i.GuildID, user.ID, role.ID)
+	s.InteractionResponseEdit("", i.Interaction, &dgo.WebhookEdit{
+		Content: "Revoked role " + role.Mention() + " from " + user.Mention(),
+	})
+}
+
+func handleCreateRole(name string, i *dgo.InteractionCreate, s *dgo.Session) {
+	// Make a new role
+	role, _ := s.GuildRoleCreate(i.GuildID)
+	// Set new role info
+	s.GuildRoleEdit(i.GuildID, role.ID, name, 10, false, 0, true)
+	s.InteractionResponseEdit("", i.Interaction, &dgo.WebhookEdit{
+		Content: "Added role " + role.Mention(),
+	})
+}
+
+func handleDeleteRole(roleID string, i *dgo.InteractionCreate, s *dgo.Session) {
+	// Get role from parms
+	role, _ := s.State.Role(i.GuildID, roleID)
+	s.GuildRoleDelete(i.GuildID, role.ID)
+	s.InteractionResponseEdit("", i.Interaction, &dgo.WebhookEdit{
+		Content: "Role Removed  " + role.Name,
+	})
+}
+
 func handleWarn(userID, violation string, i *dgo.InteractionCreate, s *dgo.Session) {
-	fmt.Println(i.Interaction.Member.Roles)
 	// Get user from parms
 	user, _ := s.User(userID)
 	s.InteractionResponseEdit("", i.Interaction, &dgo.WebhookEdit{
@@ -83,9 +144,8 @@ func regesterCommands(client *dgo.Session) {
 	client.ApplicationCommandCreate(
 		"",
 		&dgo.ApplicationCommand{
-			Name:        "Warn",
+			Name:        "warn",
 			Description: "Warn for user rule violation",
-
 			Options: []*dgo.ApplicationCommandOption{
 				{
 					Type:        dgo.ApplicationCommandOptionUser,
@@ -138,18 +198,6 @@ func regesterCommands(client *dgo.Session) {
 							Name:  "Sending Dangerous Links",
 							Value: "Sending Dangerous Links",
 						},
-						{
-							Name:  "Phishing or viruses",
-							Value: "Phishing or viruses",
-						},
-						{
-							Name:  "Rule break/misconduct",
-							Value: "Rule break/misconduct",
-						},
-						{
-							Name:  "Under 13, voilates discord TOS",
-							Value: "Under 13, voilates discord TOS",
-						},
 					},
 					Required: true,
 				},
@@ -160,20 +208,72 @@ func regesterCommands(client *dgo.Session) {
 	client.ApplicationCommandCreate(
 		"",
 		&dgo.ApplicationCommand{
-			Name:        "AddRole",
-			Description: "Adds a role to a user",
+			Name:        "role",
+			Description: "Manage user roles",
 			Options: []*dgo.ApplicationCommandOption{
 				{
-					Type:        dgo.ApplicationCommandOptionUser,
-					Name:        "User",
-					Description: "User to add role to",
-					Required:    true,
+					Type:        dgo.ApplicationCommandOptionSubCommand,
+					Name:        "assign",
+					Description: "Adds a role to a user",
+					Options: []*dgo.ApplicationCommandOption{
+						{
+							Type:        dgo.ApplicationCommandOptionUser,
+							Name:        "User",
+							Description: "User to add role to",
+							Required:    true,
+						},
+						{
+							Type:        dgo.ApplicationCommandOptionRole,
+							Name:        "Role",
+							Description: "Role to add",
+							Required:    true,
+						},
+					},
 				},
 				{
-					Type:        dgo.ApplicationCommandOptionRole,
-					Name:        "Role",
-					Description: "Role to add",
-					Required:    true,
+					Type:        dgo.ApplicationCommandOptionSubCommand,
+					Name:        "revoke",
+					Description: "Revokes a current role form a user",
+					Options: []*dgo.ApplicationCommandOption{
+						{
+							Type:        dgo.ApplicationCommandOptionUser,
+							Name:        "User",
+							Description: "User to remove role from",
+							Required:    true,
+						},
+						{
+							Type:        dgo.ApplicationCommandOptionRole,
+							Name:        "Role",
+							Description: "Role to remove",
+							Required:    true,
+						},
+					},
+				},
+				{
+					Type:        dgo.ApplicationCommandOptionSubCommand,
+					Name:        "create",
+					Description: "Makes a new role",
+					Options: []*dgo.ApplicationCommandOption{
+						{
+							Type:        dgo.ApplicationCommandOptionString,
+							Name:        "Name",
+							Description: "Role name",
+							Required:    true,
+						},
+					},
+				},
+				{
+					Type:        dgo.ApplicationCommandOptionSubCommand,
+					Name:        "delete",
+					Description: "Removes a role",
+					Options: []*dgo.ApplicationCommandOption{
+						{
+							Type:        dgo.ApplicationCommandOptionRole,
+							Name:        "role",
+							Description: "Role to remove",
+							Required:    true,
+						},
+					},
 				},
 			},
 		},
@@ -182,29 +282,7 @@ func regesterCommands(client *dgo.Session) {
 	client.ApplicationCommandCreate(
 		"",
 		&dgo.ApplicationCommand{
-			Name:        "Remove Role",
-			Description: "Revokes a current role form a user",
-			Options: []*dgo.ApplicationCommandOption{
-				{
-					Type:        dgo.ApplicationCommandOptionUser,
-					Name:        "User",
-					Description: "User to remove role from",
-					Required:    true,
-				},
-				{
-					Type:        dgo.ApplicationCommandOptionRole,
-					Name:        "Role",
-					Description: "Role to remove",
-					Required:    true,
-				},
-			},
-		},
-		guildID,
-	)
-	client.ApplicationCommandCreate(
-		"",
-		&dgo.ApplicationCommand{
-			Name:        "Kick",
+			Name:        "kick",
 			Description: "Kicks a user",
 			Options: []*dgo.ApplicationCommandOption{
 				{
