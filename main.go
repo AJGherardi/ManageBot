@@ -70,6 +70,17 @@ func handleAddRole(userID, roleID string, i *dgo.InteractionCreate, s *dgo.Sessi
 	})
 }
 
+/*func handleRemoveRole(userID, roleID string, i *dgo.InteractionCreate, s *dgo.Session) {
+	fmt.Println(i.Interaction.Member.Roles)
+	// Get user from parms
+	user, _ := s.User(userID)
+	// Get role from parms
+	role, _ := s.State.Role(i.GuildID, roleID)
+	s.InteractionResponseEdit("", i.Interaction, &dgo.WebhookEdit{
+		Content: "Removed role " + role.Mention() + " from " + user.Mention(),
+	})
+} */
+
 func handleWarn(userID, violation string, i *dgo.InteractionCreate, s *dgo.Session) {
 	fmt.Println(i.Interaction.Member.Roles)
 	// Get user from parms
