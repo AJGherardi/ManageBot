@@ -147,8 +147,8 @@ func regesterCommands(client *dgo.Session) {
 							Value: "Rule break/misconduct",
 						},
 						{
-							Name:  "Under 13",
-							Value: "Under 13",
+							Name:  "Under 13, voilates discord TOS",
+							Value: "Under 13, voilates discord TOS",
 						},
 					},
 					Required: true,
