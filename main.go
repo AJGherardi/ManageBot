@@ -336,22 +336,6 @@ func regesterCommands(client *dgo.Session) {
 	client.ApplicationCommandCreate(
 		"",
 		&dgo.ApplicationCommand{
-			Name:        "ban",
-			Description: "Kicks a user and bans the user",
-			Options: []*dgo.ApplicationCommandOption{
-				{
-					Type:        dgo.ApplicationCommandOptionUser,
-					Name:        "User",
-					Description: "User to ban",
-					Required:    true,
-				},
-			},
-		},
-		guildID,
-	)
-	client.ApplicationCommandCreate(
-		"",
-		&dgo.ApplicationCommand{
 			Name:        "purge",
 			Description: "Removes specified number of msgs from current channel",
 			Options: []*dgo.ApplicationCommandOption{
@@ -365,7 +349,6 @@ func regesterCommands(client *dgo.Session) {
 		},
 		guildID,
 	)
-
 }
 
 func deleteAllCommands(client *dgo.Session) {
