@@ -1,11 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"time"
 
+	"github.com/AJGherardi/ManageBot/commands"
 	dgo "github.com/bwmarrin/discordgo"
-	embed "github.com/clinet/discordgo-embed"
 )
 
 // botToken and guildID must be added to consts.go
@@ -45,305 +44,32 @@ func commandHandler(client *dgo.Session) func(s *dgo.Session, i *dgo.Interaction
 		// Match command to handler function
 		switch i.Interaction.Data.Name {
 		case "warn":
-			handleWarn(
+			commands.HandleWarn(
 				i.Interaction.Data.Options[0].Value.(string),
 				i.Interaction.Data.Options[1].Value.(string),
 				i,
 				s,
 			)
 		case "role":
-			handleRole(
+			commands.HandleRole(
 				i,
 				s,
 			)
 
 		case "kick":
-			handleKick(
+			commands.HandleKick(
 				i.Interaction.Data.Options[0].Value.(string),
 				i,
 				s,
 			)
 		case "purge":
-			handlePurge(
+			commands.HandlePurge(
 				i.Interaction.Data.Options[0].Value.(float64),
 				i,
 				s,
 			)
 		}
 	}
-}
-
-func handlePurge(number float64, i *dgo.InteractionCreate, s *dgo.Session) {
-	// Get msgs
-	msgs, _ := s.ChannelMessages(i.ChannelID, int(number)+1, "", "", "")
-	// Get msg ids
-	var msgIDs []string
-	for _, msg := range msgs {
-		msgIDs = append(msgIDs, msg.ID)
-	}
-	// Delete msgs
-	s.ChannelMessagesBulkDelete(i.ChannelID, msgIDs)
-	sendResponse("Removed "+fmt.Sprint(number)+" messages", i, s)
-}
-
-func handleKick(userID string, i *dgo.InteractionCreate, s *dgo.Session) {
-	// Get user from parms
-	user, _ := s.User(userID)
-	// Kick user
-	s.GuildMemberDelete(i.GuildID, user.ID)
-	sendResponse("Kicked "+user.Username, i, s)
-}
-
-func handleRole(i *dgo.InteractionCreate, s *dgo.Session) {
-	for _, option := range i.Interaction.Data.Options {
-		switch option.Name {
-		case "assign":
-			handleAssignRole(
-				option.Options[0].Value.(string),
-				option.Options[1].Value.(string),
-				i,
-				s,
-			)
-		case "revoke":
-			handleRevokeRole(
-				option.Options[0].Value.(string),
-				option.Options[1].Value.(string),
-				i,
-				s,
-			)
-		case "create":
-			handleCreateRole(
-				option.Options[0].Value.(string),
-				i,
-				s,
-			)
-		case "delete":
-			handleDeleteRole(
-				option.Options[0].Value.(string),
-				i,
-				s,
-			)
-		}
-	}
-}
-
-func handleAssignRole(userID, roleID string, i *dgo.InteractionCreate, s *dgo.Session) {
-	// Get user from parms
-	user, _ := s.User(userID)
-	// Get role from parms
-	role, _ := s.State.Role(i.GuildID, roleID)
-	// Assign role to user
-	s.GuildMemberRoleAdd(i.GuildID, user.ID, role.ID)
-	sendResponse("Added role "+role.Mention()+" to "+user.Mention(), i, s)
-}
-
-func handleRevokeRole(userID, roleID string, i *dgo.InteractionCreate, s *dgo.Session) {
-	// Get user from parms
-	user, _ := s.User(userID)
-	// Get role from parms
-	role, _ := s.State.Role(i.GuildID, roleID)
-	// Removed role from user
-	s.GuildMemberRoleRemove(i.GuildID, user.ID, role.ID)
-	sendResponse("Revoked role "+role.Mention()+" from "+user.Mention(), i, s)
-}
-
-func handleCreateRole(name string, i *dgo.InteractionCreate, s *dgo.Session) {
-	// Make a new role
-	role, _ := s.GuildRoleCreate(i.GuildID)
-	// Set new role info
-	s.GuildRoleEdit(i.GuildID, role.ID, name, 50, false, 0, true)
-	sendResponse("Added role "+role.Mention(), i, s)
-
-}
-
-func handleDeleteRole(roleID string, i *dgo.InteractionCreate, s *dgo.Session) {
-	// Get role from parms
-	role, _ := s.State.Role(i.GuildID, roleID)
-	s.GuildRoleDelete(i.GuildID, role.ID)
-	sendResponse("Role Removed  "+role.Name, i, s)
-}
-
-func handleWarn(userID, violation string, i *dgo.InteractionCreate, s *dgo.Session) {
-	// Get user from parms
-	user, _ := s.User(userID)
-	sendResponse(user.Mention()+" This is you final warning for "+violation, i, s)
-}
-
-func sendResponse(response string, i *dgo.InteractionCreate, s *dgo.Session) {
-	s.ChannelMessageSendEmbed(i.ChannelID, embed.NewGenericEmbed("", response))
-}
-
-func regesterCommands(client *dgo.Session) {
-	client.ApplicationCommandCreate(
-		"",
-		&dgo.ApplicationCommand{
-			Name:        "warn",
-			Description: "Warn for user rule violation",
-			Options: []*dgo.ApplicationCommandOption{
-				{
-					Type:        dgo.ApplicationCommandOptionUser,
-					Name:        "User",
-					Description: "User to warn",
-					Required:    true,
-				},
-				{
-					Type:        dgo.ApplicationCommandOptionString,
-					Name:        "Violation",
-					Description: "Rules violated",
-					Choices: []*dgo.ApplicationCommandOptionChoice{
-						{
-							Name:  "Gore",
-							Value: "Gore",
-						},
-						{
-							Name:  "Harassment",
-							Value: "Harassment",
-						},
-						{
-							Name:  "Disrespecting staff",
-							Value: "Disrespecting staff",
-						},
-						{
-							Name:  "Sexually explicit content",
-							Value: "Sexually explicit content",
-						},
-						{
-							Name:  "Advertizing",
-							Value: "Advertizing",
-						},
-						{
-							Name:  "Spam",
-							Value: "Spam",
-						},
-						{
-							Name:  "Obsessive pinging",
-							Value: "Obsessive Pinging",
-						},
-						{
-							Name:  "Hate Speech",
-							Value: "Hate Speech",
-						},
-						{
-							Name:  "Threatening People",
-							Value: "Threatening People",
-						},
-						{
-							Name:  "Sending Dangerous Links",
-							Value: "Sending Dangerous Links",
-						},
-					},
-					Required: true,
-				},
-			},
-		},
-		guildID,
-	)
-	client.ApplicationCommandCreate(
-		"",
-		&dgo.ApplicationCommand{
-			Name:        "role",
-			Description: "Manage user roles",
-			Options: []*dgo.ApplicationCommandOption{
-				{
-					Type:        dgo.ApplicationCommandOptionSubCommand,
-					Name:        "assign",
-					Description: "Adds a role to a user",
-					Options: []*dgo.ApplicationCommandOption{
-						{
-							Type:        dgo.ApplicationCommandOptionUser,
-							Name:        "User",
-							Description: "User to add role to",
-							Required:    true,
-						},
-						{
-							Type:        dgo.ApplicationCommandOptionRole,
-							Name:        "Role",
-							Description: "Role to add",
-							Required:    true,
-						},
-					},
-				},
-				{
-					Type:        dgo.ApplicationCommandOptionSubCommand,
-					Name:        "revoke",
-					Description: "Revokes a current role form a user",
-					Options: []*dgo.ApplicationCommandOption{
-						{
-							Type:        dgo.ApplicationCommandOptionUser,
-							Name:        "User",
-							Description: "User to remove role from",
-							Required:    true,
-						},
-						{
-							Type:        dgo.ApplicationCommandOptionRole,
-							Name:        "Role",
-							Description: "Role to remove",
-							Required:    true,
-						},
-					},
-				},
-				{
-					Type:        dgo.ApplicationCommandOptionSubCommand,
-					Name:        "create",
-					Description: "Makes a new role",
-					Options: []*dgo.ApplicationCommandOption{
-						{
-							Type:        dgo.ApplicationCommandOptionString,
-							Name:        "Name",
-							Description: "Role name",
-							Required:    true,
-						},
-					},
-				},
-				{
-					Type:        dgo.ApplicationCommandOptionSubCommand,
-					Name:        "delete",
-					Description: "Removes a role",
-					Options: []*dgo.ApplicationCommandOption{
-						{
-							Type:        dgo.ApplicationCommandOptionRole,
-							Name:        "role",
-							Description: "Role to remove",
-							Required:    true,
-						},
-					},
-				},
-			},
-		},
-		guildID,
-	)
-	client.ApplicationCommandCreate(
-		"",
-		&dgo.ApplicationCommand{
-			Name:        "kick",
-			Description: "Kicks a user",
-			Options: []*dgo.ApplicationCommandOption{
-				{
-					Type:        dgo.ApplicationCommandOptionUser,
-					Name:        "User",
-					Description: "User to kick",
-					Required:    true,
-				},
-			},
-		},
-		guildID,
-	)
-	client.ApplicationCommandCreate(
-		"",
-		&dgo.ApplicationCommand{
-			Name:        "purge",
-			Description: "Removes specified number of msgs from current channel",
-			Options: []*dgo.ApplicationCommandOption{
-				{
-					Type:        dgo.ApplicationCommandOptionInteger,
-					Name:        "Number",
-					Description: "Number of messages to remove",
-					Required:    true,
-				},
-			},
-		},
-		guildID,
-	)
 }
 
 func deleteAllCommands(client *dgo.Session) {
