@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	dgo "github.com/bwmarrin/discordgo"
@@ -54,16 +55,36 @@ func commandHandler(client *dgo.Session) func(s *dgo.Session, i *dgo.Interaction
 			)
 
 		case "kick":
-			handelKick(
+			handleKick(
 				i.Interaction.Data.Options[0].Value.(string),
 				i,
 				s,
 			)
+		case "purge":
+			handlePurge(
+				i.Interaction.Data.Options[0].Value.(float64),
+				i,
+				s,
+			)
 		}
-
 	}
 }
-func handelKick(userID string, i *dgo.InteractionCreate, s *dgo.Session) {
+
+func handlePurge(number float64, i *dgo.InteractionCreate, s *dgo.Session) {
+	// Get msgs
+	msgs, _ := s.ChannelMessages(i.ChannelID, int(number)+1, "", "", "")
+	// Get msg ids
+	var msgIDs []string
+	for _, msg := range msgs {
+		msgIDs = append(msgIDs, msg.ID)
+	}
+	// Delete msgs
+	s.ChannelMessagesBulkDelete(i.ChannelID, msgIDs)
+	s.ChannelMessageSend(i.ChannelID, "Deleted "+fmt.Sprint(number)+" messages")
+
+}
+
+func handleKick(userID string, i *dgo.InteractionCreate, s *dgo.Session) {
 	// Get user from parms
 	user, _ := s.User(userID)
 	// Kick user
@@ -71,7 +92,6 @@ func handelKick(userID string, i *dgo.InteractionCreate, s *dgo.Session) {
 	s.InteractionResponseEdit("", i.Interaction, &dgo.WebhookEdit{
 		Content: "Kicked " + user.Username,
 	})
-
 }
 
 func handleRole(i *dgo.InteractionCreate, s *dgo.Session) {
@@ -313,6 +333,39 @@ func regesterCommands(client *dgo.Session) {
 		},
 		guildID,
 	)
+	client.ApplicationCommandCreate(
+		"",
+		&dgo.ApplicationCommand{
+			Name:        "ban",
+			Description: "Kicks a user and bans the user",
+			Options: []*dgo.ApplicationCommandOption{
+				{
+					Type:        dgo.ApplicationCommandOptionUser,
+					Name:        "User",
+					Description: "User to ban",
+					Required:    true,
+				},
+			},
+		},
+		guildID,
+	)
+	client.ApplicationCommandCreate(
+		"",
+		&dgo.ApplicationCommand{
+			Name:        "purge",
+			Description: "Removes specified number of msgs from current channel",
+			Options: []*dgo.ApplicationCommandOption{
+				{
+					Type:        dgo.ApplicationCommandOptionInteger,
+					Name:        "Number",
+					Description: "Number of messages to remove",
+					Required:    true,
+				},
+			},
+		},
+		guildID,
+	)
+
 }
 
 func deleteAllCommands(client *dgo.Session) {
