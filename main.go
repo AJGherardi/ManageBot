@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/AJGherardi/ManageBot/commands"
+	"github.com/AJGherardi/ManageBot/utils"
 	dgo "github.com/bwmarrin/discordgo"
 )
 
@@ -39,8 +40,23 @@ func commandHandler(client *dgo.Session) func(s *dgo.Session, i *dgo.Interaction
 		})
 		// Wait a half sec
 		time.Sleep(500 * time.Millisecond)
+		// Chack perms
+		var autherized bool
+		for _, roleID := range i.Interaction.Member.Roles {
+			role, _ := s.State.Role(i.GuildID, roleID)
+			permited := (role.Permissions & dgo.PermissionAdministrator) == dgo.PermissionAdministrator
+			if permited {
+				autherized = true
+				break
+			}
+		}
 		// Remove initial reaponse
 		s.InteractionResponseDelete("", i.Interaction)
+		// Check if autherized
+		if autherized == false {
+			utils.SendResponse("Not autherized", i, s)
+			return
+		}
 		// Match command to handler function
 		switch i.Interaction.Data.Name {
 		case "warn":
