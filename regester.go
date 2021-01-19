@@ -160,6 +160,14 @@ func regesterCommands(client *dgo.Session) {
 	client.ApplicationCommandCreate(
 		"",
 		&dgo.ApplicationCommand{
+			Name:        "invite",
+			Description: "Generate a invite link",
+		},
+		guildID,
+	)
+	client.ApplicationCommandCreate(
+		"",
+		&dgo.ApplicationCommand{
 			Name:        "purge",
 			Description: "Removes specified number of msgs from current channel",
 			Options: []*dgo.ApplicationCommandOption{
