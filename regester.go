@@ -173,4 +173,62 @@ func regesterCommands(client *dgo.Session) {
 		},
 		guildID,
 	)
+	client.ApplicationCommandCreate(
+		"",
+		&dgo.ApplicationCommand{
+			Name:        "channel",
+			Description: "Manage channels",
+			Options: []*dgo.ApplicationCommandOption{
+				{
+					Type:        dgo.ApplicationCommandOptionSubCommand,
+					Name:        "create",
+					Description: "Adds a channel",
+					Options: []*dgo.ApplicationCommandOption{
+						{
+							Type:        dgo.ApplicationCommandOptionString,
+							Name:        "Name",
+							Description: "Name to give new channel",
+							Required:    true,
+						},
+						{
+							Type:        dgo.ApplicationCommandOptionChannel,
+							Name:        "Group",
+							Description: "Group to add channel to",
+							Required:    true,
+						},
+						{
+							Type:        dgo.ApplicationCommandOptionInteger,
+							Name:        "Type",
+							Description: "Type of new channel",
+							Choices: []*dgo.ApplicationCommandOptionChoice{
+								{Name: "Text", Value: dgo.ChannelTypeGuildText},
+								{Name: "Voice", Value: dgo.ChannelTypeGuildVoice},
+							},
+							Required: true,
+						},
+						{
+							Type:        dgo.ApplicationCommandOptionBoolean,
+							Name:        "NSFW",
+							Description: "Contains explicit material",
+							Required:    true,
+						},
+					},
+				},
+				{
+					Type:        dgo.ApplicationCommandOptionSubCommand,
+					Name:        "delete",
+					Description: "Remove a channel",
+					Options: []*dgo.ApplicationCommandOption{
+						{
+							Type:        dgo.ApplicationCommandOptionChannel,
+							Name:        "Channel",
+							Description: "Channel to remove",
+							Required:    true,
+						},
+					},
+				},
+			},
+		},
+		guildID,
+	)
 }
