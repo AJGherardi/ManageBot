@@ -5,6 +5,7 @@ import (
 	"time"
 
 	dgo "github.com/bwmarrin/discordgo"
+	embed "github.com/clinet/discordgo-embed"
 )
 
 // botToken and guildID must be added to consts.go
@@ -80,7 +81,7 @@ func handlePurge(number float64, i *dgo.InteractionCreate, s *dgo.Session) {
 	}
 	// Delete msgs
 	s.ChannelMessagesBulkDelete(i.ChannelID, msgIDs)
-	s.ChannelMessageSend(i.ChannelID, "Deleted "+fmt.Sprint(number)+" messages")
+	s.ChannelMessageSendEmbed(i.ChannelID, embed.NewGenericEmbed("Removed "+fmt.Sprint(number)+" messages", ""))
 
 }
 
@@ -173,9 +174,7 @@ func handleDeleteRole(roleID string, i *dgo.InteractionCreate, s *dgo.Session) {
 func handleWarn(userID, violation string, i *dgo.InteractionCreate, s *dgo.Session) {
 	// Get user from parms
 	user, _ := s.User(userID)
-	s.InteractionResponseEdit("", i.Interaction, &dgo.WebhookEdit{
-		Content: user.Mention() + " This is you final warning for " + violation,
-	})
+	s.ChannelMessageSendEmbed(i.ChannelID, embed.NewGenericEmbed("", user.Mention()+" This is you final warning for "+violation))
 }
 
 func regesterCommands(client *dgo.Session) {
