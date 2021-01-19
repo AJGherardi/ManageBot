@@ -40,6 +40,8 @@ func commandHandler(client *dgo.Session) func(s *dgo.Session, i *dgo.Interaction
 		})
 		// Wait a half sec
 		time.Sleep(500 * time.Millisecond)
+		// Remove initial reaponse
+		s.InteractionResponseDelete("", i.Interaction)
 		// Match command to handler function
 		switch i.Interaction.Data.Name {
 		case "warn":
@@ -81,8 +83,7 @@ func handlePurge(number float64, i *dgo.InteractionCreate, s *dgo.Session) {
 	}
 	// Delete msgs
 	s.ChannelMessagesBulkDelete(i.ChannelID, msgIDs)
-	s.ChannelMessageSendEmbed(i.ChannelID, embed.NewGenericEmbed("Removed "+fmt.Sprint(number)+" messages", ""))
-
+	sendResponse("Removed "+fmt.Sprint(number)+" messages", i, s)
 }
 
 func handleKick(userID string, i *dgo.InteractionCreate, s *dgo.Session) {
@@ -90,9 +91,7 @@ func handleKick(userID string, i *dgo.InteractionCreate, s *dgo.Session) {
 	user, _ := s.User(userID)
 	// Kick user
 	s.GuildMemberDelete(i.GuildID, user.ID)
-	s.InteractionResponseEdit("", i.Interaction, &dgo.WebhookEdit{
-		Content: "Kicked " + user.Username,
-	})
+	sendResponse("Kicked "+user.Username, i, s)
 }
 
 func handleRole(i *dgo.InteractionCreate, s *dgo.Session) {
@@ -135,9 +134,7 @@ func handleAssignRole(userID, roleID string, i *dgo.InteractionCreate, s *dgo.Se
 	role, _ := s.State.Role(i.GuildID, roleID)
 	// Assign role to user
 	s.GuildMemberRoleAdd(i.GuildID, user.ID, role.ID)
-	s.InteractionResponseEdit("", i.Interaction, &dgo.WebhookEdit{
-		Content: "Added role " + role.Mention() + " to " + user.Mention(),
-	})
+	sendResponse("Added role "+role.Mention()+" to "+user.Mention(), i, s)
 }
 
 func handleRevokeRole(userID, roleID string, i *dgo.InteractionCreate, s *dgo.Session) {
@@ -147,34 +144,33 @@ func handleRevokeRole(userID, roleID string, i *dgo.InteractionCreate, s *dgo.Se
 	role, _ := s.State.Role(i.GuildID, roleID)
 	// Removed role from user
 	s.GuildMemberRoleRemove(i.GuildID, user.ID, role.ID)
-	s.InteractionResponseEdit("", i.Interaction, &dgo.WebhookEdit{
-		Content: "Revoked role " + role.Mention() + " from " + user.Mention(),
-	})
+	sendResponse("Revoked role "+role.Mention()+" from "+user.Mention(), i, s)
 }
 
 func handleCreateRole(name string, i *dgo.InteractionCreate, s *dgo.Session) {
 	// Make a new role
 	role, _ := s.GuildRoleCreate(i.GuildID)
 	// Set new role info
-	s.GuildRoleEdit(i.GuildID, role.ID, name, 10, false, 0, true)
-	s.InteractionResponseEdit("", i.Interaction, &dgo.WebhookEdit{
-		Content: "Added role " + role.Mention(),
-	})
+	s.GuildRoleEdit(i.GuildID, role.ID, name, 50, false, 0, true)
+	sendResponse("Added role "+role.Mention(), i, s)
+
 }
 
 func handleDeleteRole(roleID string, i *dgo.InteractionCreate, s *dgo.Session) {
 	// Get role from parms
 	role, _ := s.State.Role(i.GuildID, roleID)
 	s.GuildRoleDelete(i.GuildID, role.ID)
-	s.InteractionResponseEdit("", i.Interaction, &dgo.WebhookEdit{
-		Content: "Role Removed  " + role.Name,
-	})
+	sendResponse("Role Removed  "+role.Name, i, s)
 }
 
 func handleWarn(userID, violation string, i *dgo.InteractionCreate, s *dgo.Session) {
 	// Get user from parms
 	user, _ := s.User(userID)
-	s.ChannelMessageSendEmbed(i.ChannelID, embed.NewGenericEmbed("", user.Mention()+" This is you final warning for "+violation))
+	sendResponse(user.Mention()+" This is you final warning for "+violation, i, s)
+}
+
+func sendResponse(response string, i *dgo.InteractionCreate, s *dgo.Session) {
+	s.ChannelMessageSendEmbed(i.ChannelID, embed.NewGenericEmbed("", response))
 }
 
 func regesterCommands(client *dgo.Session) {
