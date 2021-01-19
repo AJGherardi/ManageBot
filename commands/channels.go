@@ -24,6 +24,12 @@ func HandleChannel(i *dgo.InteractionCreate, s *dgo.Session) {
 				i,
 				s,
 			)
+		case "create-group":
+			handleCreateChannelGroup(
+				option.Options[0].Value.(string),
+				i,
+				s,
+			)
 		}
 	}
 }
@@ -41,5 +47,13 @@ func handleCreateChannel(name, parentID string, channelType float64, NSFW bool, 
 		ParentID: parentID,
 		NSFW:     NSFW,
 	})
-	utils.SendResponse("Added channel #"+channel.Mention(), i, s)
+	utils.SendResponse("Added channel "+channel.Mention(), i, s)
+}
+
+func handleCreateChannelGroup(name string, i *dgo.InteractionCreate, s *dgo.Session) {
+	channel, _ := s.GuildChannelCreateComplex(i.GuildID, dgo.GuildChannelCreateData{
+		Name: name,
+		Type: dgo.ChannelTypeGuildCategory,
+	})
+	utils.SendResponse("Added channel group "+channel.Mention(), i, s)
 }

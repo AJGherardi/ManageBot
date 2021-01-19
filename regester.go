@@ -209,7 +209,20 @@ func regesterCommands(client *dgo.Session) {
 						{
 							Type:        dgo.ApplicationCommandOptionBoolean,
 							Name:        "NSFW",
-							Description: "Contains explicit material",
+							Description: "Contains explicit material only applys to text channels",
+							Required:    true,
+						},
+					},
+				},
+				{
+					Type:        dgo.ApplicationCommandOptionSubCommand,
+					Name:        "create-group",
+					Description: "Adds a channel group",
+					Options: []*dgo.ApplicationCommandOption{
+						{
+							Type:        dgo.ApplicationCommandOptionString,
+							Name:        "Name",
+							Description: "Name to give new channel groupo",
 							Required:    true,
 						},
 					},
