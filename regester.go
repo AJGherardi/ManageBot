@@ -90,6 +90,22 @@ func regesterCommands(client *dgo.Session, guildID string) {
 	client.ApplicationCommandCreate(
 		"",
 		&dgo.ApplicationCommand{
+			Name:        "say",
+			Description: "Repeats a message",
+			Options: []*dgo.ApplicationCommandOption{
+				{
+					Type:        dgo.ApplicationCommandOptionString,
+					Name:        "Message",
+					Description: "Message to repeat",
+					Required:    true,
+				},
+			},
+		},
+		guildID,
+	)
+	client.ApplicationCommandCreate(
+		"",
+		&dgo.ApplicationCommand{
 			Name:        "invite",
 			Description: "Generate a invite link",
 		},
