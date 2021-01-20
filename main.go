@@ -101,6 +101,11 @@ func commandHandler(client *dgo.Session) func(s *dgo.Session, i *dgo.Interaction
 				i,
 				s,
 			)
+		case "vote":
+			commands.HandleVote(
+				i,
+				s,
+			)
 		}
 	}
 }
