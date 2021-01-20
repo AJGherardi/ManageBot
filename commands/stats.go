@@ -1,21 +1,29 @@
-package stats
+package commands
 
+import (
+	"github.com/AJGherardi/ManageBot/utils"
+	dgo "github.com/bwmarrin/discordgo"
+)
 
 // HandleStats handles a stat command
 func HandleStats(i *dgo.InteractionCreate, s *dgo.Session) {
-// Gathers stats
+	// Gathers stats
 	// Gathers number of bots
-		numberOfBots := "holderoftheplaces"
+	numberOfBots := 0
 	// Gathers number of members
-		numberOfPariticipants := "holderoftheplaces"
+	numberOfPariticipants := 0
 	// Gathers number of members online
-		numberOfPariticipantsOnline := "holderoftheplaces"
+	numberOfPariticipantsOnline := 0
 	// Gathers numbers of people with staff role
-		numberOfStaff := "holderoftheplaces"
+	numberOfStaff := 0
 	// Gathers numbers of people with staff role that are online
-		numberOfStaffOnline := "holderoftheplaces"
+	numberOfStaffOnline := 0
+	// Does math to find the current member amount
+	numberOfMembers := int(numberOfPariticipants) - int(numberOfBots)
+	// Does math to find the current member amount online
+	numberOfMembersOnline := int(numberOfPariticipantsOnline) - int(numberOfBots)
 	// Sends stats
-	utils.SendResponse("There are " numberOfBots " many bots", i, s)
-	utils.SendResponse("There are " numberOfPariticipants-numberOfBots " many users. " numberOfPariticipantsOnline " of which are online", i, s)
-	utils.SendResponse("There are " numberOfStaff " many users. " numberOfStaffOnline " of which are online", i, s)
-} 
+	utils.SendResponse("There are "+string(numberOfBots)+" many bots", i, s)
+	utils.SendResponse("There are "+string(numberOfMembers)+" many users. "+string(numberOfMembersOnline)+" of which are online", i, s)
+	utils.SendResponse("There are "+string(numberOfStaff)+" many users. "+string(numberOfStaffOnline)+" of which are online", i, s)
+}

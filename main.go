@@ -52,8 +52,8 @@ func commandHandler(client *dgo.Session) func(s *dgo.Session, i *dgo.Interaction
 		}
 		// Remove initial reaponse
 		s.InteractionResponseDelete("", i.Interaction)
-		// Check if autherized
-		if autherized == false {
+		// Check if authorized
+		if authorized == false {
 			utils.SendResponse("Not authorized", i, s)
 			return
 		}
