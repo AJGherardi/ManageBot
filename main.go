@@ -31,7 +31,7 @@ func commandHandler(client *dgo.Session) func(s *dgo.Session, i *dgo.Interaction
 		// Makes a reaponse
 		responseData := &dgo.InteractionApplicationCommandResponseData{
 			TTS:     false,
-			Content: "Pls wait",
+			Content: "Please wait",
 		}
 		// Sends the inital response
 		s.InteractionRespond(i.Interaction, &dgo.InteractionResponse{
