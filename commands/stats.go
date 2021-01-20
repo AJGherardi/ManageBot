@@ -23,7 +23,7 @@ func HandleStats(i *dgo.InteractionCreate, s *dgo.Session) {
 	// Does math to find the current member amount online
 	numberOfMembersOnline := int(numberOfPariticipantsOnline) - int(numberOfBots)
 	// Sends stats
-	utils.SendResponse("There are "+string(numberOfBots)+" many bots", i, s)
-	utils.SendResponse("There are "+string(numberOfMembers)+" many users. "+string(numberOfMembersOnline)+" of which are online", i, s)
-	utils.SendResponse("There are "+string(numberOfStaff)+" many users. "+string(numberOfStaffOnline)+" of which are online", i, s)
+	utils.SendResponse("There are "+fmt.Sprint(numberOfBots)+" many bots", i, s)
+	utils.SendResponse("There are "+fmt.Sprint(numberOfMembers)+" many users. "+fmt.Sprint(numberOfMembersOnline)+" of which are online", i, s)
+	utils.SendResponse("There are "+fmt.SprintnumberOfStaff)+" many users. "+fmt.Sprint(numberOfStaffOnline)+" of which are online", i, s)
 }

@@ -110,16 +110,15 @@ func regesterCommands(client *dgo.Session, guildID string) {
 			},
 		},
 		guildID,
-	) 
-		client.ApplicationCommandCreate(
-			"",
-			&dgo.ApplicationCommand{
-				Name:        "stats",
-				Description: "Shows stats of a server or channel",
-				},
-			},
-			guildID,
-		) 
+	)
+	client.ApplicationCommandCreate(
+		"",
+		&dgo.ApplicationCommand{
+			Name:        "stats",
+			Description: "Shows stats of a server or channel",
+		},
+		guildID,
+	)
 	client.ApplicationCommandCreate(
 		"",
 		&dgo.ApplicationCommand{
