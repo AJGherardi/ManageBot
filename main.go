@@ -94,6 +94,12 @@ func commandHandler(client *dgo.Session) func(s *dgo.Session, i *dgo.Interaction
 				i,
 				s,
 			)
+		case "say":
+			commands.HandleSay(
+				i.Interaction.Data.Options[0].Value.(string),
+				i,
+				s,
+			)
 		}
 	}
 }
