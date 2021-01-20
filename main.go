@@ -93,12 +93,12 @@ func commandHandler(client *dgo.Session) func(s *dgo.Session, i *dgo.Interaction
 			commands.HandleInvite(
 				i,
 				s,
-			) /*
-				case "stats":
-					commands.HandleStats(
-						i,
-						s,
-					) */
+			)
+		case "stats":
+			commands.HandleStats(
+				i,
+				s,
+			)
 		}
 	}
 }

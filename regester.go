@@ -110,7 +110,7 @@ func regesterCommands(client *dgo.Session, guildID string) {
 			},
 		},
 		guildID,
-	) /*
+	) 
 		client.ApplicationCommandCreate(
 			"",
 			&dgo.ApplicationCommand{
@@ -119,7 +119,7 @@ func regesterCommands(client *dgo.Session, guildID string) {
 				},
 			},
 			guildID,
-		) */
+		) 
 	client.ApplicationCommandCreate(
 		"",
 		&dgo.ApplicationCommand{
