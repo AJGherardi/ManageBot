@@ -49,6 +49,45 @@ func HandleRole(i *dgo.InteractionCreate, s *dgo.Session) {
 				i,
 				s,
 			)
+		case "membership-permissions-set":
+			handleRoleMembershipPermissionsSet(
+				option.Options[0].Value.(string),
+				option.Options[1].Value.(bool),
+				option.Options[2].Value.(bool),
+				option.Options[3].Value.(bool),
+				option.Options[4].Value.(bool),
+				option.Options[5].Value.(bool),
+				i,
+				s,
+			)
+		case "text-permissions-set":
+			handleRoleTextPermissionsSet(
+				option.Options[0].Value.(string),
+				option.Options[1].Value.(bool),
+				option.Options[2].Value.(bool),
+				option.Options[3].Value.(bool),
+				option.Options[4].Value.(bool),
+				option.Options[5].Value.(bool),
+				option.Options[6].Value.(bool),
+				option.Options[7].Value.(bool),
+				option.Options[8].Value.(bool),
+				option.Options[9].Value.(bool),
+				i,
+				s,
+			)
+		case "voice-permissions-set":
+			handleRoleVoicePermissionsSet(
+				option.Options[0].Value.(string),
+				option.Options[1].Value.(bool),
+				option.Options[2].Value.(bool),
+				option.Options[3].Value.(bool),
+				option.Options[4].Value.(bool),
+				option.Options[5].Value.(bool),
+				option.Options[6].Value.(bool),
+				option.Options[7].Value.(bool),
+				i,
+				s,
+			)
 		}
 	}
 }
@@ -86,6 +125,114 @@ func handleDeleteRole(roleID string, i *dgo.InteractionCreate, s *dgo.Session) {
 	role, _ := s.State.Role(i.GuildID, roleID)
 	s.GuildRoleDelete(i.GuildID, role.ID)
 	utils.SendResponse("Role Removed  "+role.Name, i, s)
+}
+
+func handleRoleVoicePermissionsSet(
+	roleID string,
+	connect bool,
+	speek bool,
+	useVoiceActivity bool,
+	prioritySpeeker bool,
+	muteMembers bool,
+	deafenMembers bool,
+	moveMembers bool,
+	i *dgo.InteractionCreate,
+	s *dgo.Session,
+) {
+	// Get role from parms
+	role, _ := s.State.Role(i.GuildID, roleID)
+	// Copy perm int
+	permissions := role.Permissions
+	// Set permissions
+	permissions = setPermission(connect, permissions, dgo.PermissionVoiceConnect)
+	permissions = setPermission(speek, permissions, dgo.PermissionVoiceSpeak)
+	permissions = setPermission(useVoiceActivity, permissions, dgo.PermissionVoiceUseVAD)
+	permissions = setPermission(prioritySpeeker, permissions, dgo.PermissionVoicePrioritySpeaker)
+	permissions = setPermission(muteMembers, permissions, dgo.PermissionVoiceMuteMembers)
+	permissions = setPermission(deafenMembers, permissions, dgo.PermissionVoiceDeafenMembers)
+	permissions = setPermission(moveMembers, permissions, dgo.PermissionVoiceMoveMembers)
+	// Save perm int
+	s.GuildRoleEdit(
+		i.GuildID,
+		role.ID,
+		role.Name,
+		role.Color,
+		role.Hoist,
+		permissions,
+		role.Mentionable,
+	)
+}
+
+func handleRoleTextPermissionsSet(
+	roleID string,
+	sendMessages bool,
+	embedLinks bool,
+	attachFiles bool,
+	addReactions bool,
+	useExternalEmoji bool,
+	mentionAllRoles bool,
+	manageMessages bool,
+	readMessageHistory bool,
+	sendTTSMessages bool,
+	i *dgo.InteractionCreate,
+	s *dgo.Session,
+) {
+	// Get role from parms
+	role, _ := s.State.Role(i.GuildID, roleID)
+	// Copy perm int
+	permissions := role.Permissions
+	// Set permissions
+	permissions = setPermission(sendMessages, permissions, dgo.PermissionSendMessages)
+	permissions = setPermission(embedLinks, permissions, dgo.PermissionEmbedLinks)
+	permissions = setPermission(attachFiles, permissions, dgo.PermissionAttachFiles)
+	permissions = setPermission(addReactions, permissions, dgo.PermissionAddReactions)
+	permissions = setPermission(useExternalEmoji, permissions, dgo.PermissionUseExternalEmojis)
+	permissions = setPermission(mentionAllRoles, permissions, dgo.PermissionMentionEveryone)
+	permissions = setPermission(manageMessages, permissions, dgo.PermissionManageMessages)
+	permissions = setPermission(readMessageHistory, permissions, dgo.PermissionReadMessageHistory)
+	permissions = setPermission(sendTTSMessages, permissions, dgo.PermissionSendTTSMessages)
+	// Save perm int
+	s.GuildRoleEdit(
+		i.GuildID,
+		role.ID,
+		role.Name,
+		role.Color,
+		role.Hoist,
+		permissions,
+		role.Mentionable,
+	)
+}
+
+func handleRoleMembershipPermissionsSet(
+	roleID string,
+	createInvite bool,
+	changeNicknames bool,
+	manageNicknames bool,
+	kickMembers bool,
+	banMembers bool,
+	i *dgo.InteractionCreate,
+	s *dgo.Session,
+) {
+	// Get role from parms
+	role, _ := s.State.Role(i.GuildID, roleID)
+	// Copy perm int
+	permissions := role.Permissions
+	// Set permissions
+	permissions = setPermission(createInvite, permissions, dgo.PermissionCreateInstantInvite)
+	permissions = setPermission(changeNicknames, permissions, dgo.PermissionChangeNickname)
+	permissions = setPermission(manageNicknames, permissions, dgo.PermissionManageNicknames)
+	permissions = setPermission(kickMembers, permissions, dgo.PermissionKickMembers)
+	permissions = setPermission(banMembers, permissions, dgo.PermissionBanMembers)
+	// Save perm int
+	s.GuildRoleEdit(
+		i.GuildID,
+		role.ID,
+		role.Name,
+		role.Color,
+		role.Hoist,
+		permissions,
+		role.Mentionable,
+	)
 }
 
 func handleRoleGeneralPermissionsSet(
@@ -210,7 +357,7 @@ func RegesterRoles(client *dgo.Session, guildID string) {
 				{
 					Type:        dgo.ApplicationCommandOptionSubCommand,
 					Name:        "general-permissions-set",
-					Description: "Removes a role",
+					Description: "Sets general permissions for a role",
 					Options: append(
 						[]*dgo.ApplicationCommandOption{
 							{
@@ -221,6 +368,54 @@ func RegesterRoles(client *dgo.Session, guildID string) {
 							},
 						},
 						generalPermissionsList()...,
+					),
+				},
+				{
+					Type:        dgo.ApplicationCommandOptionSubCommand,
+					Name:        "membership-permissions-set",
+					Description: "Sets membership permissions for a role",
+					Options: append(
+						[]*dgo.ApplicationCommandOption{
+							{
+								Type:        dgo.ApplicationCommandOptionRole,
+								Name:        "role",
+								Description: "Role to remove",
+								Required:    true,
+							},
+						},
+						membershipPermissionsList()...,
+					),
+				},
+				{
+					Type:        dgo.ApplicationCommandOptionSubCommand,
+					Name:        "text-permissions-set",
+					Description: "Sets text permissions for a role",
+					Options: append(
+						[]*dgo.ApplicationCommandOption{
+							{
+								Type:        dgo.ApplicationCommandOptionRole,
+								Name:        "role",
+								Description: "Role to remove",
+								Required:    true,
+							},
+						},
+						textPermissionsList()...,
+					),
+				},
+				{
+					Type:        dgo.ApplicationCommandOptionSubCommand,
+					Name:        "voice-permissions-set",
+					Description: "Sets voice permissions for a role",
+					Options: append(
+						[]*dgo.ApplicationCommandOption{
+							{
+								Type:        dgo.ApplicationCommandOptionRole,
+								Name:        "role",
+								Description: "Role to remove",
+								Required:    true,
+							},
+						},
+						voicePermissionsList()...,
 					),
 				},
 			},
@@ -387,12 +582,6 @@ func voicePermissionsList() []*dgo.ApplicationCommandOption {
 		{
 			Type:        dgo.ApplicationCommandOptionBoolean,
 			Name:        "Speek",
-			Description: "Check discord permissions list",
-			Required:    true,
-		},
-		{
-			Type:        dgo.ApplicationCommandOptionBoolean,
-			Name:        "Video",
 			Description: "Check discord permissions list",
 			Required:    true,
 		},
