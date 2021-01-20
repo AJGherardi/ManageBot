@@ -110,7 +110,16 @@ func regesterCommands(client *dgo.Session, guildID string) {
 			},
 		},
 		guildID,
-	)
+	) /*
+		client.ApplicationCommandCreate(
+			"",
+			&dgo.ApplicationCommand{
+				Name:        "stats",
+				Description: "Shows stats of a server or channel",
+				},
+			},
+			guildID,
+		) */
 	client.ApplicationCommandCreate(
 		"",
 		&dgo.ApplicationCommand{
@@ -130,8 +139,8 @@ func regesterCommands(client *dgo.Session, guildID string) {
 						},
 						{
 							Type:        dgo.ApplicationCommandOptionChannel,
-							Name:        "Group",
-							Description: "Group to add channel to",
+							Name:        "Category",
+							Description: "Category to add channel to",
 							Required:    true,
 						},
 						{

@@ -31,7 +31,7 @@ func commandHandler(client *dgo.Session) func(s *dgo.Session, i *dgo.Interaction
 		// Makes a reaponse
 		responseData := &dgo.InteractionApplicationCommandResponseData{
 			TTS:     false,
-			Content: "Pls wait",
+			Content: "Please wait",
 		}
 		// Sends the inital response
 		s.InteractionRespond(i.Interaction, &dgo.InteractionResponse{
@@ -41,12 +41,12 @@ func commandHandler(client *dgo.Session) func(s *dgo.Session, i *dgo.Interaction
 		// Wait a half sec
 		time.Sleep(500 * time.Millisecond)
 		// Chack perms
-		var autherized bool
+		var authorized bool
 		for _, roleID := range i.Interaction.Member.Roles {
 			role, _ := s.State.Role(i.GuildID, roleID)
 			permited := (role.Permissions & dgo.PermissionAdministrator) == dgo.PermissionAdministrator
 			if permited {
-				autherized = true
+				authorized = true
 				break
 			}
 		}
@@ -54,7 +54,7 @@ func commandHandler(client *dgo.Session) func(s *dgo.Session, i *dgo.Interaction
 		s.InteractionResponseDelete("", i.Interaction)
 		// Check if autherized
 		if autherized == false {
-			utils.SendResponse("Not autherized", i, s)
+			utils.SendResponse("Not authorized", i, s)
 			return
 		}
 		// Match command to handler function
@@ -93,7 +93,12 @@ func commandHandler(client *dgo.Session) func(s *dgo.Session, i *dgo.Interaction
 			commands.HandleInvite(
 				i,
 				s,
-			)
+			) /*
+				case "stats":
+					commands.HandleStats(
+						i,
+						s,
+					) */
 		}
 	}
 }
