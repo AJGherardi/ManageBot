@@ -20,7 +20,7 @@ func main() {
 	// Remove all commands
 	deleteAllCommands(client)
 	// Regesters the commands
-	regesterCommands(client)
+	regesterCommands(client, guildID)
 	// Keep the app runing
 	for {
 	}
