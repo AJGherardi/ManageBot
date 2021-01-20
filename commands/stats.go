@@ -1,6 +1,8 @@
 package commands
 
 import (
+	"fmt"
+
 	"github.com/AJGherardi/ManageBot/utils"
 	dgo "github.com/bwmarrin/discordgo"
 )
@@ -25,5 +27,5 @@ func HandleStats(i *dgo.InteractionCreate, s *dgo.Session) {
 	// Sends stats
 	utils.SendResponse("There are "+fmt.Sprint(numberOfBots)+" many bots", i, s)
 	utils.SendResponse("There are "+fmt.Sprint(numberOfMembers)+" many users. "+fmt.Sprint(numberOfMembersOnline)+" of which are online", i, s)
-	utils.SendResponse("There are "+fmt.SprintnumberOfStaff)+" many users. "+fmt.Sprint(numberOfStaffOnline)+" of which are online", i, s)
+	utils.SendResponse("There are "+fmt.Sprint(numberOfStaff)+" many users. "+fmt.Sprint(numberOfStaffOnline)+" of which are online", i, s)
 }
