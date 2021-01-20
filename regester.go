@@ -96,7 +96,7 @@ func regesterCommands(client *dgo.Session, guildID string) {
 				{
 					Type:        dgo.ApplicationCommandOptionString,
 					Name:        "Message",
-					Description: "Message ti repeat",
+					Description: "Message to repeat",
 					Required:    true,
 				},
 			},
