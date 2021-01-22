@@ -18,7 +18,10 @@ func HandleStats(i *dgo.InteractionCreate, s *dgo.Session) {
 			bots = append(bots, member)
 		}
 	}
+	// Get guild
+	guild, _ := s.Guild(i.GuildID)
 	// Sends stats
-	utils.SendResponse("There are "+fmt.Sprint(len(members))+" many members", i, s)
+	utils.SendResponse("There are "+fmt.Sprint(len(members))+" many members ", i, s) //Possibly add presences later for members
 	utils.SendResponse("There are "+fmt.Sprint(len(bots))+" many bots", i, s)
+	utils.SendResponse("There are "+fmt.Sprint(guild.PremiumSubscriptionCount)+" many people boosting your server", i, s)
 }
