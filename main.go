@@ -106,6 +106,14 @@ func commandHandler(client *dgo.Session) func(s *dgo.Session, i *dgo.Interaction
 				i,
 				s,
 			)
+		case "vote":
+			commands.HandleVote(
+				i.Interaction.Data.Options[0].Value.(string),
+				i.Interaction.Data.Options[1].Value.(string),
+				i.Interaction.Data.Options[2].Value.(float64),
+				i,
+				s,
+			)
 		}
 	}
 }
