@@ -41,20 +41,20 @@ func commandHandler(client *dgo.Session) func(s *dgo.Session, i *dgo.Interaction
 		// Wait a half sec
 		time.Sleep(500 * time.Millisecond)
 		// Chack perms
-		var autherized bool
+		var authorized bool
 		for _, roleID := range i.Interaction.Member.Roles {
 			role, _ := s.State.Role(i.GuildID, roleID)
 			permited := (role.Permissions & dgo.PermissionAdministrator) == dgo.PermissionAdministrator
 			if permited {
-				autherized = true
+				authorized = true
 				break
 			}
 		}
 		// Remove initial reaponse
 		s.InteractionResponseDelete("", i.Interaction)
-		// Check if autherized
-		if autherized == false {
-			utils.SendResponse("Not autherized", i, s)
+		// Check if authorized
+		if authorized == false {
+			utils.SendResponse("Not authorized", i, s)
 			return
 		}
 		// Match command to handler function
@@ -91,6 +91,11 @@ func commandHandler(client *dgo.Session) func(s *dgo.Session, i *dgo.Interaction
 			)
 		case "invite":
 			commands.HandleInvite(
+				i,
+				s,
+			)
+		case "stats":
+			commands.HandleStats(
 				i,
 				s,
 			)

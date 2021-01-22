@@ -136,6 +136,36 @@ func regesterCommands(client *dgo.Session, guildID string) {
 	client.ApplicationCommandCreate(
 		"",
 		&dgo.ApplicationCommand{
+			Name:        "stats",
+			Description: "Shows stats of a server or channel",
+		},
+		guildID,
+	)
+	client.ApplicationCommandCreate(
+		"",
+		&dgo.ApplicationCommand{
+			Name:        "say",
+			Description: "Repeats a message",
+			Options: []*dgo.ApplicationCommandOption{
+				{
+					Type:        dgo.ApplicationCommandOptionString,
+					Name:        "Message",
+					Description: "Message to repeat",
+					Required:    true,
+				},
+				{
+					Type:        dgo.ApplicationCommandOptionInteger,
+					Name:        "Repeat",
+					Description: "Number of times to repeat",
+					Required:    true,
+				},
+			},
+		},
+		guildID,
+	)
+	client.ApplicationCommandCreate(
+		"",
+		&dgo.ApplicationCommand{
 			Name:        "channel",
 			Description: "Manage channels",
 			Options: []*dgo.ApplicationCommandOption{
@@ -152,8 +182,8 @@ func regesterCommands(client *dgo.Session, guildID string) {
 						},
 						{
 							Type:        dgo.ApplicationCommandOptionChannel,
-							Name:        "Group",
-							Description: "Group to add channel to",
+							Name:        "Category",
+							Description: "Category to add channel to",
 							Required:    true,
 						},
 						{
