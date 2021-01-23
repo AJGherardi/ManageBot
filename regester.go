@@ -118,6 +118,28 @@ func regesterCommands(client *dgo.Session, guildID string) {
 	client.ApplicationCommandCreate(
 		"",
 		&dgo.ApplicationCommand{
+			Name:        "remind",
+			Description: "Set a reminder",
+			Options: []*dgo.ApplicationCommandOption{
+				{
+					Type:        dgo.ApplicationCommandOptionString,
+					Name:        "Title",
+					Description: "Title of vote message",
+					Required:    true,
+				},
+				{
+					Type:        dgo.ApplicationCommandOptionInteger,
+					Name:        "Time",
+					Description: "How many min until reminder",
+					Required:    true,
+				},
+			},
+		},
+		guildID,
+	)
+	client.ApplicationCommandCreate(
+		"",
+		&dgo.ApplicationCommand{
 			Name:        "say",
 			Description: "Repeats a message",
 			Options: []*dgo.ApplicationCommandOption{

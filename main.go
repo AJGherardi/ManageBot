@@ -114,6 +114,13 @@ func commandHandler(client *dgo.Session) func(s *dgo.Session, i *dgo.Interaction
 				i,
 				s,
 			)
+		case "remind":
+			commands.HandleRemind(
+				i.Interaction.Data.Options[0].Value.(string),
+				i.Interaction.Data.Options[1].Value.(float64),
+				i,
+				s,
+			)
 		}
 	}
 }
