@@ -119,6 +119,11 @@ func commandHandler(client *dgo.Session) func(s *dgo.Session, i *dgo.Interaction
 				i,
 				s,
 			)
+		case "init":
+			commands.HandleInit(
+				i,
+				s,
+			)
 		}
 	}
 }

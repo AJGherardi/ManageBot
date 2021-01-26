@@ -195,6 +195,14 @@ func regesterCommands(client *dgo.Session, guildID string) {
 	client.ApplicationCommandCreate(
 		"",
 		&dgo.ApplicationCommand{
+			Name:        "init",
+			Description: "Adds internal channels and roles to server",
+		},
+		guildID,
+	)
+	client.ApplicationCommandCreate(
+		"",
+		&dgo.ApplicationCommand{
 			Name:        "purge",
 			Description: "Removes specified number of msgs from current channel",
 			Options: []*dgo.ApplicationCommandOption{
