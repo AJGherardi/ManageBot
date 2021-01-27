@@ -5,8 +5,9 @@ import (
 	dgo "github.com/bwmarrin/discordgo"
 )
 
-func regesterCommands(client *dgo.Session, guildID string) {
-	commands.RegesterInit(client, guildID)
+func regesterCommands(client *dgo.Session, guildID string) []commands.Handler {
+	commands.RegesterChannel(client, guildID)
+	initHandler := commands.RegesterInit(client, guildID)
 	commands.RegesterInvite(client, guildID)
 	commands.RegesterKick(client, guildID)
 	commands.RegesterPurge(client, guildID)
@@ -16,4 +17,7 @@ func regesterCommands(client *dgo.Session, guildID string) {
 	commands.RegesterStats(client, guildID)
 	commands.RegesterVote(client, guildID)
 	commands.RegesterWarn(client, guildID)
+	return []commands.Handler{
+		initHandler,
+	}
 }

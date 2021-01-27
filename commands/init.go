@@ -33,7 +33,7 @@ func HandleInit(i *dgo.InteractionCreate, s *dgo.Session) {
 }
 
 // RegesterInit adds the init / command
-func RegesterInit(client *dgo.Session, guildID string) {
+func RegesterInit(client *dgo.Session, guildID string) Handler {
 	client.ApplicationCommandCreate(
 		"",
 		&dgo.ApplicationCommand{
@@ -42,4 +42,14 @@ func RegesterInit(client *dgo.Session, guildID string) {
 		},
 		guildID,
 	)
+	// Return Handler
+	return Handler{
+		"init", HandleInit,
+	}
+}
+
+// Handler holds a refrence to the handler function for a application command
+type Handler struct {
+	Name     string
+	Callback func(i *dgo.InteractionCreate, s *dgo.Session)
 }
