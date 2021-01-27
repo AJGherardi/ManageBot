@@ -57,3 +57,78 @@ func handleCreateChannelGroup(name string, i *dgo.InteractionCreate, s *dgo.Sess
 	})
 	utils.SendResponse("Added channel group "+channel.Mention(), i, s)
 }
+
+// RegesterChannel adds the channel / commands
+func RegesterChannel(client *dgo.Session, guildID string) {
+	client.ApplicationCommandCreate(
+		"",
+		&dgo.ApplicationCommand{
+			Name:        "channel",
+			Description: "Manage channels",
+			Options: []*dgo.ApplicationCommandOption{
+				{
+					Type:        dgo.ApplicationCommandOptionSubCommand,
+					Name:        "create",
+					Description: "Adds a channel",
+					Options: []*dgo.ApplicationCommandOption{
+						{
+							Type:        dgo.ApplicationCommandOptionString,
+							Name:        "Name",
+							Description: "Name to give new channel",
+							Required:    true,
+						},
+						{
+							Type:        dgo.ApplicationCommandOptionChannel,
+							Name:        "Category",
+							Description: "Category to add channel to",
+							Required:    true,
+						},
+						{
+							Type:        dgo.ApplicationCommandOptionInteger,
+							Name:        "Type",
+							Description: "Type of new channel",
+							Choices: []*dgo.ApplicationCommandOptionChoice{
+								{Name: "Text", Value: dgo.ChannelTypeGuildText},
+								{Name: "Voice", Value: dgo.ChannelTypeGuildVoice},
+							},
+							Required: true,
+						},
+						{
+							Type:        dgo.ApplicationCommandOptionBoolean,
+							Name:        "NSFW",
+							Description: "Contains explicit material only applys to text channels",
+							Required:    true,
+						},
+					},
+				},
+				{
+					Type:        dgo.ApplicationCommandOptionSubCommand,
+					Name:        "create-group",
+					Description: "Adds a channel group",
+					Options: []*dgo.ApplicationCommandOption{
+						{
+							Type:        dgo.ApplicationCommandOptionString,
+							Name:        "Name",
+							Description: "Name to give new channel groupo",
+							Required:    true,
+						},
+					},
+				},
+				{
+					Type:        dgo.ApplicationCommandOptionSubCommand,
+					Name:        "delete",
+					Description: "Remove a channel",
+					Options: []*dgo.ApplicationCommandOption{
+						{
+							Type:        dgo.ApplicationCommandOptionChannel,
+							Name:        "Channel",
+							Description: "Channel to remove",
+							Required:    true,
+						},
+					},
+				},
+			},
+		},
+		guildID,
+	)
+}

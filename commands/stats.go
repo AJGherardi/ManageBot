@@ -40,3 +40,15 @@ func HandleStats(i *dgo.InteractionCreate, s *dgo.Session) {
 	utils.SendResponse("There are "+fmt.Sprint(len(bots))+" many bots", i, s)
 	utils.SendResponse("There are "+fmt.Sprint(guild.PremiumSubscriptionCount)+" many people boosting your server", i, s)
 }
+
+// RegesterStats adds the stats / command
+func RegesterStats(client *dgo.Session, guildID string) {
+	client.ApplicationCommandCreate(
+		"",
+		&dgo.ApplicationCommand{
+			Name:        "stats",
+			Description: "Shows stats of a server or channel",
+		},
+		guildID,
+	)
+}

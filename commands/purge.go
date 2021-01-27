@@ -20,3 +20,23 @@ func HandlePurge(number float64, i *dgo.InteractionCreate, s *dgo.Session) {
 	s.ChannelMessagesBulkDelete(i.ChannelID, msgIDs)
 	utils.SendResponse("Removed "+fmt.Sprint(number)+" messages", i, s)
 }
+
+// RegesterPurge adds the kick / command
+func RegesterPurge(client *dgo.Session, guildID string) {
+	client.ApplicationCommandCreate(
+		"",
+		&dgo.ApplicationCommand{
+			Name:        "purge",
+			Description: "Removes specified number of msgs from current channel",
+			Options: []*dgo.ApplicationCommandOption{
+				{
+					Type:        dgo.ApplicationCommandOptionInteger,
+					Name:        "Number",
+					Description: "Number of messages to remove",
+					Required:    true,
+				},
+			},
+		},
+		guildID,
+	)
+}

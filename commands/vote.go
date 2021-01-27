@@ -34,3 +34,35 @@ func sendVoteMessage(title, caption string, i *dgo.InteractionCreate, s *dgo.Ses
 	voteMessage, _ := s.ChannelMessageSendEmbed(i.ChannelID, embed.NewGenericEmbed(title, caption))
 	return voteMessage.ID
 }
+
+// RegesterVote adds the vote / command
+func RegesterVote(client *dgo.Session, guildID string) {
+	client.ApplicationCommandCreate(
+		"",
+		&dgo.ApplicationCommand{
+			Name:        "vote",
+			Description: "Make a vote",
+			Options: []*dgo.ApplicationCommandOption{
+				{
+					Type:        dgo.ApplicationCommandOptionString,
+					Name:        "Title",
+					Description: "Title of vote message",
+					Required:    true,
+				},
+				{
+					Type:        dgo.ApplicationCommandOptionString,
+					Name:        "Caption",
+					Description: "Caption for vote message",
+					Required:    true,
+				},
+				{
+					Type:        dgo.ApplicationCommandOptionInteger,
+					Name:        "Time",
+					Description: "Time till end of vote in min",
+					Required:    true,
+				},
+			},
+		},
+		guildID,
+	)
+}

@@ -74,3 +74,54 @@ func handleRemindDelete(index float64, i *dgo.InteractionCreate, s *dgo.Session)
 func removeRemind(slice []remind, s int) []remind {
 	return append(slice[:s], slice[s+1:]...)
 }
+
+// RegesterRemind adds the remind / command
+func RegesterRemind(client *dgo.Session, guildID string) {
+	client.ApplicationCommandCreate(
+		"",
+		&dgo.ApplicationCommand{
+			Name:        "remind",
+			Description: "Manage reminders",
+			Options: []*dgo.ApplicationCommandOption{
+				{
+					Type:        dgo.ApplicationCommandOptionSubCommand,
+					Name:        "set",
+					Description: "Set a reminder",
+					Options: []*dgo.ApplicationCommandOption{
+						{
+							Type:        dgo.ApplicationCommandOptionString,
+							Name:        "Title",
+							Description: "Title of reminder",
+							Required:    true,
+						},
+						{
+							Type:        dgo.ApplicationCommandOptionInteger,
+							Name:        "Time",
+							Description: "How many min until reminder",
+							Required:    true,
+						},
+					},
+				},
+				{
+					Type:        dgo.ApplicationCommandOptionSubCommand,
+					Name:        "view",
+					Description: "View reminders",
+				},
+				{
+					Type:        dgo.ApplicationCommandOptionSubCommand,
+					Name:        "delete",
+					Description: "Deletes the reminder at the given index",
+					Options: []*dgo.ApplicationCommandOption{
+						{
+							Type:        dgo.ApplicationCommandOptionInteger,
+							Name:        "index",
+							Description: "Index of reminder",
+							Required:    true,
+						},
+					},
+				},
+			},
+		},
+		guildID,
+	)
+}
