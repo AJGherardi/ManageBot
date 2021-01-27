@@ -1,23 +1,35 @@
 package main
 
 import (
+	"github.com/AJGherardi/ManageBot/types"
+
 	"github.com/AJGherardi/ManageBot/commands"
 	dgo "github.com/bwmarrin/discordgo"
 )
 
-func regesterCommands(client *dgo.Session, guildID string) []commands.Handler {
-	commands.RegesterChannel(client, guildID)
+func regesterCommands(client *dgo.Session, guildID string) []types.Handler {
+	channelHandler := commands.RegesterChannel(client, guildID)
 	initHandler := commands.RegesterInit(client, guildID)
-	commands.RegesterInvite(client, guildID)
-	commands.RegesterKick(client, guildID)
-	commands.RegesterPurge(client, guildID)
-	commands.RegesterRemind(client, guildID)
-	commands.RegesterRoles(client, guildID)
-	commands.RegesterSay(client, guildID)
-	commands.RegesterStats(client, guildID)
-	commands.RegesterVote(client, guildID)
-	commands.RegesterWarn(client, guildID)
-	return []commands.Handler{
+	inviteHandler := commands.RegesterInvite(client, guildID)
+	kickHandler := commands.RegesterKick(client, guildID)
+	purgeHandler := commands.RegesterPurge(client, guildID)
+	remindHandler := commands.RegesterRemind(client, guildID)
+	rolesHandler := commands.RegesterRoles(client, guildID)
+	sayHandler := commands.RegesterSay(client, guildID)
+	statsHandler := commands.RegesterStats(client, guildID)
+	voteHandler := commands.RegesterVote(client, guildID)
+	warnHandler := commands.RegesterWarn(client, guildID)
+	return []types.Handler{
+		channelHandler,
 		initHandler,
+		inviteHandler,
+		kickHandler,
+		purgeHandler,
+		remindHandler,
+		rolesHandler,
+		sayHandler,
+		statsHandler,
+		voteHandler,
+		warnHandler,
 	}
 }

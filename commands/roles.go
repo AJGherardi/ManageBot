@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"github.com/AJGherardi/ManageBot/types"
 	"github.com/AJGherardi/ManageBot/utils"
 	dgo "github.com/bwmarrin/discordgo"
 )
@@ -283,7 +284,7 @@ func setPermission(value bool, permissions int, permission int) int {
 }
 
 // RegesterRoles adds all role related / commands
-func RegesterRoles(client *dgo.Session, guildID string) {
+func RegesterRoles(client *dgo.Session, guildID string) types.Handler {
 	client.ApplicationCommandCreate(
 		"",
 		&dgo.ApplicationCommand{
@@ -422,6 +423,10 @@ func RegesterRoles(client *dgo.Session, guildID string) {
 		},
 		guildID,
 	)
+	// Return Handler
+	return types.Handler{
+		Name: "role", Callback: HandleRole,
+	}
 }
 
 func generalPermissionsList() []*dgo.ApplicationCommandOption {

@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"github.com/AJGherardi/ManageBot/types"
 	"github.com/AJGherardi/ManageBot/utils"
 	dgo "github.com/bwmarrin/discordgo"
 )
@@ -13,7 +14,7 @@ func HandleSay(message string, number float64, i *dgo.InteractionCreate, s *dgo.
 }
 
 // RegesterSay adds the say / command
-func RegesterSay(client *dgo.Session, guildID string) {
+func RegesterSay(client *dgo.Session, guildID string) types.Handler {
 	client.ApplicationCommandCreate(
 		"",
 		&dgo.ApplicationCommand{
@@ -36,4 +37,15 @@ func RegesterSay(client *dgo.Session, guildID string) {
 		},
 		guildID,
 	)
+	// Return Handler
+	return types.Handler{
+		Name: "say", Callback: func(i *dgo.InteractionCreate, s *dgo.Session) {
+			HandleSay(
+				i.Interaction.Data.Options[0].Value.(string),
+				i.Interaction.Data.Options[1].Value.(float64),
+				i,
+				s,
+			)
+		},
+	}
 }

@@ -3,6 +3,7 @@ package commands
 import (
 	"fmt"
 
+	"github.com/AJGherardi/ManageBot/types"
 	"github.com/AJGherardi/ManageBot/utils"
 	dgo "github.com/bwmarrin/discordgo"
 )
@@ -22,7 +23,7 @@ func HandlePurge(number float64, i *dgo.InteractionCreate, s *dgo.Session) {
 }
 
 // RegesterPurge adds the kick / command
-func RegesterPurge(client *dgo.Session, guildID string) {
+func RegesterPurge(client *dgo.Session, guildID string) types.Handler {
 	client.ApplicationCommandCreate(
 		"",
 		&dgo.ApplicationCommand{
@@ -39,4 +40,14 @@ func RegesterPurge(client *dgo.Session, guildID string) {
 		},
 		guildID,
 	)
+	// Return Handler
+	return types.Handler{
+		Name: "purge", Callback: func(i *dgo.InteractionCreate, s *dgo.Session) {
+			HandlePurge(
+				i.Interaction.Data.Options[0].Value.(float64),
+				i,
+				s,
+			)
+		},
+	}
 }

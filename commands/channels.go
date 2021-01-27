@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"github.com/AJGherardi/ManageBot/types"
 	"github.com/AJGherardi/ManageBot/utils"
 	dgo "github.com/bwmarrin/discordgo"
 )
@@ -59,7 +60,7 @@ func handleCreateChannelGroup(name string, i *dgo.InteractionCreate, s *dgo.Sess
 }
 
 // RegesterChannel adds the channel / commands
-func RegesterChannel(client *dgo.Session, guildID string) {
+func RegesterChannel(client *dgo.Session, guildID string) types.Handler {
 	client.ApplicationCommandCreate(
 		"",
 		&dgo.ApplicationCommand{
@@ -131,4 +132,8 @@ func RegesterChannel(client *dgo.Session, guildID string) {
 		},
 		guildID,
 	)
+	// Return Handler
+	return types.Handler{
+		Name: "channel", Callback: HandleChannel,
+	}
 }

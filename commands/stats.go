@@ -3,6 +3,7 @@ package commands
 import (
 	"fmt"
 
+	"github.com/AJGherardi/ManageBot/types"
 	"github.com/AJGherardi/ManageBot/utils"
 	dgo "github.com/bwmarrin/discordgo"
 )
@@ -42,7 +43,7 @@ func HandleStats(i *dgo.InteractionCreate, s *dgo.Session) {
 }
 
 // RegesterStats adds the stats / command
-func RegesterStats(client *dgo.Session, guildID string) {
+func RegesterStats(client *dgo.Session, guildID string) types.Handler {
 	client.ApplicationCommandCreate(
 		"",
 		&dgo.ApplicationCommand{
@@ -51,4 +52,8 @@ func RegesterStats(client *dgo.Session, guildID string) {
 		},
 		guildID,
 	)
+	// Return Handler
+	return types.Handler{
+		Name: "stats", Callback: HandleStats,
+	}
 }

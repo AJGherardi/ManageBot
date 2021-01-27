@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"github.com/AJGherardi/ManageBot/types"
 	"github.com/AJGherardi/ManageBot/utils"
 	dgo "github.com/bwmarrin/discordgo"
 )
@@ -33,7 +34,7 @@ func HandleInit(i *dgo.InteractionCreate, s *dgo.Session) {
 }
 
 // RegesterInit adds the init / command
-func RegesterInit(client *dgo.Session, guildID string) Handler {
+func RegesterInit(client *dgo.Session, guildID string) types.Handler {
 	client.ApplicationCommandCreate(
 		"",
 		&dgo.ApplicationCommand{
@@ -43,13 +44,7 @@ func RegesterInit(client *dgo.Session, guildID string) Handler {
 		guildID,
 	)
 	// Return Handler
-	return Handler{
-		"init", HandleInit,
+	return types.Handler{
+		Name: "init", Callback: HandleInit,
 	}
-}
-
-// Handler holds a refrence to the handler function for a application command
-type Handler struct {
-	Name     string
-	Callback func(i *dgo.InteractionCreate, s *dgo.Session)
 }

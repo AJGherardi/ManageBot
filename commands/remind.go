@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/AJGherardi/ManageBot/types"
 	"github.com/AJGherardi/ManageBot/utils"
 	dgo "github.com/bwmarrin/discordgo"
 )
@@ -76,7 +77,7 @@ func removeRemind(slice []remind, s int) []remind {
 }
 
 // RegesterRemind adds the remind / command
-func RegesterRemind(client *dgo.Session, guildID string) {
+func RegesterRemind(client *dgo.Session, guildID string) types.Handler {
 	client.ApplicationCommandCreate(
 		"",
 		&dgo.ApplicationCommand{
@@ -124,4 +125,8 @@ func RegesterRemind(client *dgo.Session, guildID string) {
 		},
 		guildID,
 	)
+	// Return Handler
+	return types.Handler{
+		Name: "remind", Callback: HandleRemind,
+	}
 }

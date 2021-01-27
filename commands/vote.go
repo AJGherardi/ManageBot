@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/AJGherardi/ManageBot/types"
 	"github.com/AJGherardi/ManageBot/utils"
 	dgo "github.com/bwmarrin/discordgo"
 	embed "github.com/clinet/discordgo-embed"
@@ -36,7 +37,7 @@ func sendVoteMessage(title, caption string, i *dgo.InteractionCreate, s *dgo.Ses
 }
 
 // RegesterVote adds the vote / command
-func RegesterVote(client *dgo.Session, guildID string) {
+func RegesterVote(client *dgo.Session, guildID string) types.Handler {
 	client.ApplicationCommandCreate(
 		"",
 		&dgo.ApplicationCommand{
@@ -65,4 +66,16 @@ func RegesterVote(client *dgo.Session, guildID string) {
 		},
 		guildID,
 	)
+	// Return Handler
+	return types.Handler{
+		Name: "vote", Callback: func(i *dgo.InteractionCreate, s *dgo.Session) {
+			HandleVote(
+				i.Interaction.Data.Options[0].Value.(string),
+				i.Interaction.Data.Options[1].Value.(string),
+				i.Interaction.Data.Options[2].Value.(float64),
+				i,
+				s,
+			)
+		},
+	}
 }

@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"github.com/AJGherardi/ManageBot/types"
 	"github.com/AJGherardi/ManageBot/utils"
 	dgo "github.com/bwmarrin/discordgo"
 )
@@ -17,7 +18,7 @@ func HandleInvite(i *dgo.InteractionCreate, s *dgo.Session) {
 }
 
 // RegesterInvite adds the invite / command
-func RegesterInvite(client *dgo.Session, guildID string) {
+func RegesterInvite(client *dgo.Session, guildID string) types.Handler {
 	client.ApplicationCommandCreate(
 		"",
 		&dgo.ApplicationCommand{
@@ -26,4 +27,7 @@ func RegesterInvite(client *dgo.Session, guildID string) {
 		},
 		guildID,
 	)
+	return types.Handler{
+		Name: "invite", Callback: HandleInvite,
+	}
 }

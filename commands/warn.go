@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"github.com/AJGherardi/ManageBot/types"
 	"github.com/AJGherardi/ManageBot/utils"
 	dgo "github.com/bwmarrin/discordgo"
 )
@@ -13,7 +14,7 @@ func HandleWarn(userID, violation string, i *dgo.InteractionCreate, s *dgo.Sessi
 }
 
 // RegesterWarn adds the warn / command
-func RegesterWarn(client *dgo.Session, guildID string) {
+func RegesterWarn(client *dgo.Session, guildID string) types.Handler {
 	client.ApplicationCommandCreate(
 		"",
 		&dgo.ApplicationCommand{
@@ -78,4 +79,15 @@ func RegesterWarn(client *dgo.Session, guildID string) {
 		},
 		guildID,
 	)
+	// Return Handler
+	return types.Handler{
+		Name: "warn", Callback: func(i *dgo.InteractionCreate, s *dgo.Session) {
+			HandleWarn(
+				i.Interaction.Data.Options[0].Value.(string),
+				i.Interaction.Data.Options[1].Value.(string),
+				i,
+				s,
+			)
+		},
+	}
 }
