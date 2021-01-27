@@ -6,11 +6,14 @@ import (
 	dgo "github.com/bwmarrin/discordgo"
 )
 
-// HandleChannel handles a top level channel command
-func HandleChannel(i *dgo.InteractionCreate, s *dgo.Session) {
-	for _, option := range i.Interaction.Data.Options {
-		switch option.Name {
-		case "create":
+var channelSubcommands []types.Subcommand = []types.Subcommand{
+	{
+		Name: "create",
+		Callback: func(
+			i *dgo.InteractionCreate,
+			s *dgo.Session,
+			option *dgo.ApplicationCommandInteractionDataOption,
+		) {
 			handleCreateChannel(
 				option.Options[0].Value.(string),
 				option.Options[1].Value.(string),
@@ -19,20 +22,36 @@ func HandleChannel(i *dgo.InteractionCreate, s *dgo.Session) {
 				i,
 				s,
 			)
-		case "delete":
+		},
+	},
+	{
+		Name: "delete",
+		Callback: func(
+			i *dgo.InteractionCreate,
+			s *dgo.Session,
+			option *dgo.ApplicationCommandInteractionDataOption,
+		) {
 			handleDeleteChannel(
 				option.Options[0].Value.(string),
 				i,
 				s,
 			)
-		case "create-group":
+		},
+	},
+	{
+		Name: "create-group",
+		Callback: func(
+			i *dgo.InteractionCreate,
+			s *dgo.Session,
+			option *dgo.ApplicationCommandInteractionDataOption,
+		) {
 			handleCreateChannelGroup(
 				option.Options[0].Value.(string),
 				i,
 				s,
 			)
-		}
-	}
+		},
+	},
 }
 
 func handleDeleteChannel(channelID string, i *dgo.InteractionCreate, s *dgo.Session) {
@@ -134,6 +153,8 @@ func RegesterChannel(client *dgo.Session, guildID string) types.Handler {
 	)
 	// Return Handler
 	return types.Handler{
-		Name: "channel", Callback: HandleChannel,
+		Name: "channel", Callback: func(i *dgo.InteractionCreate, s *dgo.Session) {
+			utils.MatchSubcommand(i, s, channelSubcommands)
+		},
 	}
 }
