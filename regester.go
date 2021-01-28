@@ -12,6 +12,7 @@ func regesterCommands(client *dgo.Session, guildID string) []types.Handler {
 	initHandler := commands.RegesterInit(client, guildID)
 	inviteHandler := commands.RegesterInvite(client, guildID)
 	kickHandler := commands.RegesterKick(client, guildID)
+	nicknameHandler := commands.RegesterNickname(client, guildID)
 	purgeHandler := commands.RegesterPurge(client, guildID)
 	remindHandler := commands.RegesterRemind(client, guildID)
 	rolesHandler := commands.RegesterRoles(client, guildID)
@@ -24,6 +25,7 @@ func regesterCommands(client *dgo.Session, guildID string) []types.Handler {
 		initHandler,
 		inviteHandler,
 		kickHandler,
+		nicknameHandler,
 		purgeHandler,
 		remindHandler,
 		rolesHandler,
