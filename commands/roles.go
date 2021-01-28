@@ -1,41 +1,78 @@
 package commands
 
 import (
+	"github.com/AJGherardi/ManageBot/types"
 	"github.com/AJGherardi/ManageBot/utils"
 	dgo "github.com/bwmarrin/discordgo"
 )
 
-// HandleRole handles a top level role command
-func HandleRole(i *dgo.InteractionCreate, s *dgo.Session) {
-	for _, option := range i.Interaction.Data.Options {
-		switch option.Name {
-		case "assign":
+var roleSubcommands []types.Subcommand = []types.Subcommand{
+	{
+		Name: "assign",
+		Callback: func(
+			i *dgo.InteractionCreate,
+			s *dgo.Session,
+			option *dgo.ApplicationCommandInteractionDataOption,
+		) {
 			handleAssignRole(
 				option.Options[0].Value.(string),
 				option.Options[1].Value.(string),
 				i,
 				s,
 			)
-		case "revoke":
+		},
+	},
+	{
+		Name: "revoke",
+		Callback: func(
+			i *dgo.InteractionCreate,
+			s *dgo.Session,
+			option *dgo.ApplicationCommandInteractionDataOption,
+		) {
 			handleRevokeRole(
 				option.Options[0].Value.(string),
 				option.Options[1].Value.(string),
 				i,
 				s,
 			)
-		case "create":
+		},
+	},
+	{
+		Name: "create",
+		Callback: func(
+			i *dgo.InteractionCreate,
+			s *dgo.Session,
+			option *dgo.ApplicationCommandInteractionDataOption,
+		) {
 			handleCreateRole(
 				option.Options[0].Value.(string),
 				i,
 				s,
 			)
-		case "delete":
+		},
+	},
+	{
+		Name: "delete",
+		Callback: func(
+			i *dgo.InteractionCreate,
+			s *dgo.Session,
+			option *dgo.ApplicationCommandInteractionDataOption,
+		) {
 			handleDeleteRole(
 				option.Options[0].Value.(string),
 				i,
 				s,
 			)
-		case "general-permissions-set":
+
+		},
+	},
+	{
+		Name: "general-permissions-set",
+		Callback: func(
+			i *dgo.InteractionCreate,
+			s *dgo.Session,
+			option *dgo.ApplicationCommandInteractionDataOption,
+		) {
 			handleRoleGeneralPermissionsSet(
 				option.Options[0].Value.(string),
 				option.Options[1].Value.(bool),
@@ -49,7 +86,15 @@ func HandleRole(i *dgo.InteractionCreate, s *dgo.Session) {
 				i,
 				s,
 			)
-		case "membership-permissions-set":
+		},
+	},
+	{
+		Name: "membership-permissions-set",
+		Callback: func(
+			i *dgo.InteractionCreate,
+			s *dgo.Session,
+			option *dgo.ApplicationCommandInteractionDataOption,
+		) {
 			handleRoleMembershipPermissionsSet(
 				option.Options[0].Value.(string),
 				option.Options[1].Value.(bool),
@@ -60,7 +105,15 @@ func HandleRole(i *dgo.InteractionCreate, s *dgo.Session) {
 				i,
 				s,
 			)
-		case "text-permissions-set":
+		},
+	},
+	{
+		Name: "text-permissions-set",
+		Callback: func(
+			i *dgo.InteractionCreate,
+			s *dgo.Session,
+			option *dgo.ApplicationCommandInteractionDataOption,
+		) {
 			handleRoleTextPermissionsSet(
 				option.Options[0].Value.(string),
 				option.Options[1].Value.(bool),
@@ -75,7 +128,15 @@ func HandleRole(i *dgo.InteractionCreate, s *dgo.Session) {
 				i,
 				s,
 			)
-		case "voice-permissions-set":
+		},
+	},
+	{
+		Name: "voice-permissions-set",
+		Callback: func(
+			i *dgo.InteractionCreate,
+			s *dgo.Session,
+			option *dgo.ApplicationCommandInteractionDataOption,
+		) {
 			handleRoleVoicePermissionsSet(
 				option.Options[0].Value.(string),
 				option.Options[1].Value.(bool),
@@ -88,8 +149,8 @@ func HandleRole(i *dgo.InteractionCreate, s *dgo.Session) {
 				i,
 				s,
 			)
-		}
-	}
+		},
+	},
 }
 
 func handleAssignRole(userID, roleID string, i *dgo.InteractionCreate, s *dgo.Session) {
@@ -283,7 +344,7 @@ func setPermission(value bool, permissions int, permission int) int {
 }
 
 // RegesterRoles adds all role related / commands
-func RegesterRoles(client *dgo.Session, guildID string) {
+func RegesterRoles(client *dgo.Session, guildID string) types.Handler {
 	client.ApplicationCommandCreate(
 		"",
 		&dgo.ApplicationCommand{
@@ -422,6 +483,12 @@ func RegesterRoles(client *dgo.Session, guildID string) {
 		},
 		guildID,
 	)
+	// Return Handler
+	return types.Handler{
+		Name: "role", Callback: func(i *dgo.InteractionCreate, s *dgo.Session) {
+			utils.MatchSubcommand(i, s, roleSubcommands)
+		},
+	}
 }
 
 func generalPermissionsList() []*dgo.ApplicationCommandOption {

@@ -1,15 +1,19 @@
 package commands
 
 import (
+	"github.com/AJGherardi/ManageBot/types"
 	"github.com/AJGherardi/ManageBot/utils"
 	dgo "github.com/bwmarrin/discordgo"
 )
 
-// HandleChannel handles a top level channel command
-func HandleChannel(i *dgo.InteractionCreate, s *dgo.Session) {
-	for _, option := range i.Interaction.Data.Options {
-		switch option.Name {
-		case "create":
+var channelSubcommands []types.Subcommand = []types.Subcommand{
+	{
+		Name: "create",
+		Callback: func(
+			i *dgo.InteractionCreate,
+			s *dgo.Session,
+			option *dgo.ApplicationCommandInteractionDataOption,
+		) {
 			handleCreateChannel(
 				option.Options[0].Value.(string),
 				option.Options[1].Value.(string),
@@ -18,20 +22,36 @@ func HandleChannel(i *dgo.InteractionCreate, s *dgo.Session) {
 				i,
 				s,
 			)
-		case "delete":
+		},
+	},
+	{
+		Name: "delete",
+		Callback: func(
+			i *dgo.InteractionCreate,
+			s *dgo.Session,
+			option *dgo.ApplicationCommandInteractionDataOption,
+		) {
 			handleDeleteChannel(
 				option.Options[0].Value.(string),
 				i,
 				s,
 			)
-		case "create-group":
+		},
+	},
+	{
+		Name: "create-group",
+		Callback: func(
+			i *dgo.InteractionCreate,
+			s *dgo.Session,
+			option *dgo.ApplicationCommandInteractionDataOption,
+		) {
 			handleCreateChannelGroup(
 				option.Options[0].Value.(string),
 				i,
 				s,
 			)
-		}
-	}
+		},
+	},
 }
 
 func handleDeleteChannel(channelID string, i *dgo.InteractionCreate, s *dgo.Session) {
@@ -56,4 +76,85 @@ func handleCreateChannelGroup(name string, i *dgo.InteractionCreate, s *dgo.Sess
 		Type: dgo.ChannelTypeGuildCategory,
 	})
 	utils.SendResponse("Added channel group "+channel.Mention(), i, s)
+}
+
+// RegesterChannel adds the channel / commands
+func RegesterChannel(client *dgo.Session, guildID string) types.Handler {
+	client.ApplicationCommandCreate(
+		"",
+		&dgo.ApplicationCommand{
+			Name:        "channel",
+			Description: "Manage channels",
+			Options: []*dgo.ApplicationCommandOption{
+				{
+					Type:        dgo.ApplicationCommandOptionSubCommand,
+					Name:        "create",
+					Description: "Adds a channel",
+					Options: []*dgo.ApplicationCommandOption{
+						{
+							Type:        dgo.ApplicationCommandOptionString,
+							Name:        "Name",
+							Description: "Name to give new channel",
+							Required:    true,
+						},
+						{
+							Type:        dgo.ApplicationCommandOptionChannel,
+							Name:        "Category",
+							Description: "Category to add channel to",
+							Required:    true,
+						},
+						{
+							Type:        dgo.ApplicationCommandOptionInteger,
+							Name:        "Type",
+							Description: "Type of new channel",
+							Choices: []*dgo.ApplicationCommandOptionChoice{
+								{Name: "Text", Value: dgo.ChannelTypeGuildText},
+								{Name: "Voice", Value: dgo.ChannelTypeGuildVoice},
+							},
+							Required: true,
+						},
+						{
+							Type:        dgo.ApplicationCommandOptionBoolean,
+							Name:        "NSFW",
+							Description: "Contains explicit material only applys to text channels",
+							Required:    true,
+						},
+					},
+				},
+				{
+					Type:        dgo.ApplicationCommandOptionSubCommand,
+					Name:        "create-group",
+					Description: "Adds a channel group",
+					Options: []*dgo.ApplicationCommandOption{
+						{
+							Type:        dgo.ApplicationCommandOptionString,
+							Name:        "Name",
+							Description: "Name to give new channel groupo",
+							Required:    true,
+						},
+					},
+				},
+				{
+					Type:        dgo.ApplicationCommandOptionSubCommand,
+					Name:        "delete",
+					Description: "Remove a channel",
+					Options: []*dgo.ApplicationCommandOption{
+						{
+							Type:        dgo.ApplicationCommandOptionChannel,
+							Name:        "Channel",
+							Description: "Channel to remove",
+							Required:    true,
+						},
+					},
+				},
+			},
+		},
+		guildID,
+	)
+	// Return Handler
+	return types.Handler{
+		Name: "channel", Callback: func(i *dgo.InteractionCreate, s *dgo.Session) {
+			utils.MatchSubcommand(i, s, channelSubcommands)
+		},
+	}
 }

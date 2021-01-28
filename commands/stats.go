@@ -3,6 +3,7 @@ package commands
 import (
 	"fmt"
 
+	"github.com/AJGherardi/ManageBot/types"
 	"github.com/AJGherardi/ManageBot/utils"
 	dgo "github.com/bwmarrin/discordgo"
 )
@@ -39,4 +40,20 @@ func HandleStats(i *dgo.InteractionCreate, s *dgo.Session) {
 	utils.SendResponse("There are "+fmt.Sprint(len(members))+" many members "+fmt.Sprint(online)+" of which are online", i, s)
 	utils.SendResponse("There are "+fmt.Sprint(len(bots))+" many bots", i, s)
 	utils.SendResponse("There are "+fmt.Sprint(guild.PremiumSubscriptionCount)+" many people boosting your server", i, s)
+}
+
+// RegesterStats adds the stats / command
+func RegesterStats(client *dgo.Session, guildID string) types.Handler {
+	client.ApplicationCommandCreate(
+		"",
+		&dgo.ApplicationCommand{
+			Name:        "stats",
+			Description: "Shows stats of a server or channel",
+		},
+		guildID,
+	)
+	// Return Handler
+	return types.Handler{
+		Name: "stats", Callback: HandleStats,
+	}
 }

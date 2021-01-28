@@ -3,6 +3,7 @@ package commands
 import (
 	"fmt"
 
+	"github.com/AJGherardi/ManageBot/types"
 	"github.com/AJGherardi/ManageBot/utils"
 	dgo "github.com/bwmarrin/discordgo"
 )
@@ -19,4 +20,34 @@ func HandlePurge(number float64, i *dgo.InteractionCreate, s *dgo.Session) {
 	// Delete msgs
 	s.ChannelMessagesBulkDelete(i.ChannelID, msgIDs)
 	utils.SendResponse("Removed "+fmt.Sprint(number)+" messages", i, s)
+}
+
+// RegesterPurge adds the kick / command
+func RegesterPurge(client *dgo.Session, guildID string) types.Handler {
+	client.ApplicationCommandCreate(
+		"",
+		&dgo.ApplicationCommand{
+			Name:        "purge",
+			Description: "Removes specified number of msgs from current channel",
+			Options: []*dgo.ApplicationCommandOption{
+				{
+					Type:        dgo.ApplicationCommandOptionInteger,
+					Name:        "Number",
+					Description: "Number of messages to remove",
+					Required:    true,
+				},
+			},
+		},
+		guildID,
+	)
+	// Return Handler
+	return types.Handler{
+		Name: "purge", Callback: func(i *dgo.InteractionCreate, s *dgo.Session) {
+			HandlePurge(
+				i.Interaction.Data.Options[0].Value.(float64),
+				i,
+				s,
+			)
+		},
+	}
 }

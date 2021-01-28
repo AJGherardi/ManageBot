@@ -3,7 +3,7 @@ package main
 import (
 	"time"
 
-	"github.com/AJGherardi/ManageBot/commands"
+	"github.com/AJGherardi/ManageBot/types"
 	"github.com/AJGherardi/ManageBot/utils"
 	dgo "github.com/bwmarrin/discordgo"
 )
@@ -13,20 +13,20 @@ import (
 func main() {
 	// Creates a new client object
 	client, _ := dgo.New("Bot " + botToken)
-	// Regesters a event handeler for when the command is called
-	client.AddHandler(commandHandler(client))
 	// Opens the connection
 	client.Open()
 	// Remove all commands
 	deleteAllCommands(client)
 	// Regesters the commands
-	regesterCommands(client, guildID)
+	handlers := regesterCommands(client, guildID)
+	// Regesters a event handeler for when the command is called
+	client.AddHandler(commandHandler(client, handlers))
 	// Keep the app runing
 	for {
 	}
 }
 
-func commandHandler(client *dgo.Session) func(s *dgo.Session, i *dgo.InteractionCreate) {
+func commandHandler(client *dgo.Session, handlers []types.Handler) func(s *dgo.Session, i *dgo.InteractionCreate) {
 	return func(s *dgo.Session, i *dgo.InteractionCreate) {
 		// Makes a reaponse
 		responseData := &dgo.InteractionApplicationCommandResponseData{
@@ -58,67 +58,10 @@ func commandHandler(client *dgo.Session) func(s *dgo.Session, i *dgo.Interaction
 			return
 		}
 		// Match command to handler function
-		switch i.Interaction.Data.Name {
-		case "warn":
-			commands.HandleWarn(
-				i.Interaction.Data.Options[0].Value.(string),
-				i.Interaction.Data.Options[1].Value.(string),
-				i,
-				s,
-			)
-		case "role":
-			commands.HandleRole(
-				i,
-				s,
-			)
-
-		case "kick":
-			commands.HandleKick(
-				i.Interaction.Data.Options[0].Value.(string),
-				i,
-				s,
-			)
-		case "purge":
-			commands.HandlePurge(
-				i.Interaction.Data.Options[0].Value.(float64),
-				i,
-				s,
-			)
-		case "channel":
-			commands.HandleChannel(
-				i,
-				s,
-			)
-		case "invite":
-			commands.HandleInvite(
-				i,
-				s,
-			)
-		case "stats":
-			commands.HandleStats(
-				i,
-				s,
-			)
-		case "say":
-			commands.HandleSay(
-				i.Interaction.Data.Options[0].Value.(string),
-				i.Interaction.Data.Options[1].Value.(float64),
-				i,
-				s,
-			)
-		case "vote":
-			commands.HandleVote(
-				i.Interaction.Data.Options[0].Value.(string),
-				i.Interaction.Data.Options[1].Value.(string),
-				i.Interaction.Data.Options[2].Value.(float64),
-				i,
-				s,
-			)
-		case "remind":
-			commands.HandleRemind(
-				i,
-				s,
-			)
+		for _, handler := range handlers {
+			if handler.Name == i.Interaction.Data.Name {
+				handler.Callback(i, s)
+			}
 		}
 	}
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/AJGherardi/ManageBot/types"
 	"github.com/AJGherardi/ManageBot/utils"
 	dgo "github.com/bwmarrin/discordgo"
 )
@@ -15,30 +16,49 @@ type remind struct {
 
 var reminders []remind
 
-// HandleRemind handles a remind command duration is in min
-func HandleRemind(i *dgo.InteractionCreate, s *dgo.Session) {
-	for _, option := range i.Interaction.Data.Options {
-		switch option.Name {
-		case "set":
+var remindSubcommands []types.Subcommand = []types.Subcommand{
+	{
+		Name: "set",
+		Callback: func(
+			i *dgo.InteractionCreate,
+			s *dgo.Session,
+			option *dgo.ApplicationCommandInteractionDataOption,
+		) {
 			handleRemindSet(
 				option.Options[0].Value.(string),
 				option.Options[1].Value.(float64),
 				i,
 				s,
 			)
-		case "view":
+		},
+	},
+	{
+		Name: "view",
+		Callback: func(
+			i *dgo.InteractionCreate,
+			s *dgo.Session,
+			option *dgo.ApplicationCommandInteractionDataOption,
+		) {
 			handleRemindView(
 				i,
 				s,
 			)
-		case "delete":
+		},
+	},
+	{
+		Name: "delete",
+		Callback: func(
+			i *dgo.InteractionCreate,
+			s *dgo.Session,
+			option *dgo.ApplicationCommandInteractionDataOption,
+		) {
 			handleRemindDelete(
 				option.Options[0].Value.(float64),
 				i,
 				s,
 			)
-		}
-	}
+		},
+	},
 }
 
 func handleRemindSet(title string, duration float64, i *dgo.InteractionCreate, s *dgo.Session) {
@@ -73,4 +93,61 @@ func handleRemindDelete(index float64, i *dgo.InteractionCreate, s *dgo.Session)
 
 func removeRemind(slice []remind, s int) []remind {
 	return append(slice[:s], slice[s+1:]...)
+}
+
+// RegesterRemind adds the remind / command
+func RegesterRemind(client *dgo.Session, guildID string) types.Handler {
+	client.ApplicationCommandCreate(
+		"",
+		&dgo.ApplicationCommand{
+			Name:        "remind",
+			Description: "Manage reminders",
+			Options: []*dgo.ApplicationCommandOption{
+				{
+					Type:        dgo.ApplicationCommandOptionSubCommand,
+					Name:        "set",
+					Description: "Set a reminder",
+					Options: []*dgo.ApplicationCommandOption{
+						{
+							Type:        dgo.ApplicationCommandOptionString,
+							Name:        "Title",
+							Description: "Title of reminder",
+							Required:    true,
+						},
+						{
+							Type:        dgo.ApplicationCommandOptionInteger,
+							Name:        "Time",
+							Description: "How many min until reminder",
+							Required:    true,
+						},
+					},
+				},
+				{
+					Type:        dgo.ApplicationCommandOptionSubCommand,
+					Name:        "view",
+					Description: "View reminders",
+				},
+				{
+					Type:        dgo.ApplicationCommandOptionSubCommand,
+					Name:        "delete",
+					Description: "Deletes the reminder at the given index",
+					Options: []*dgo.ApplicationCommandOption{
+						{
+							Type:        dgo.ApplicationCommandOptionInteger,
+							Name:        "index",
+							Description: "Index of reminder",
+							Required:    true,
+						},
+					},
+				},
+			},
+		},
+		guildID,
+	)
+	// Return Handler
+	return types.Handler{
+		Name: "remind", Callback: func(i *dgo.InteractionCreate, s *dgo.Session) {
+			utils.MatchSubcommand(i, s, remindSubcommands)
+		},
+	}
 }

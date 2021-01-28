@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/AJGherardi/ManageBot/types"
 	"github.com/AJGherardi/ManageBot/utils"
 	dgo "github.com/bwmarrin/discordgo"
 	embed "github.com/clinet/discordgo-embed"
@@ -33,4 +34,48 @@ func HandleVote(title, caption string, duration float64, i *dgo.InteractionCreat
 func sendVoteMessage(title, caption string, i *dgo.InteractionCreate, s *dgo.Session) string {
 	voteMessage, _ := s.ChannelMessageSendEmbed(i.ChannelID, embed.NewGenericEmbed(title, caption))
 	return voteMessage.ID
+}
+
+// RegesterVote adds the vote / command
+func RegesterVote(client *dgo.Session, guildID string) types.Handler {
+	client.ApplicationCommandCreate(
+		"",
+		&dgo.ApplicationCommand{
+			Name:        "vote",
+			Description: "Make a vote",
+			Options: []*dgo.ApplicationCommandOption{
+				{
+					Type:        dgo.ApplicationCommandOptionString,
+					Name:        "Title",
+					Description: "Title of vote message",
+					Required:    true,
+				},
+				{
+					Type:        dgo.ApplicationCommandOptionString,
+					Name:        "Caption",
+					Description: "Caption for vote message",
+					Required:    true,
+				},
+				{
+					Type:        dgo.ApplicationCommandOptionInteger,
+					Name:        "Time",
+					Description: "Time till end of vote in min",
+					Required:    true,
+				},
+			},
+		},
+		guildID,
+	)
+	// Return Handler
+	return types.Handler{
+		Name: "vote", Callback: func(i *dgo.InteractionCreate, s *dgo.Session) {
+			HandleVote(
+				i.Interaction.Data.Options[0].Value.(string),
+				i.Interaction.Data.Options[1].Value.(string),
+				i.Interaction.Data.Options[2].Value.(float64),
+				i,
+				s,
+			)
+		},
+	}
 }
