@@ -16,30 +16,49 @@ type remind struct {
 
 var reminders []remind
 
-// HandleRemind handles a remind command duration is in min
-func HandleRemind(i *dgo.InteractionCreate, s *dgo.Session) {
-	for _, option := range i.Interaction.Data.Options {
-		switch option.Name {
-		case "set":
+var remindSubcommands []types.Subcommand = []types.Subcommand{
+	{
+		Name: "set",
+		Callback: func(
+			i *dgo.InteractionCreate,
+			s *dgo.Session,
+			option *dgo.ApplicationCommandInteractionDataOption,
+		) {
 			handleRemindSet(
 				option.Options[0].Value.(string),
 				option.Options[1].Value.(float64),
 				i,
 				s,
 			)
-		case "view":
+		},
+	},
+	{
+		Name: "view",
+		Callback: func(
+			i *dgo.InteractionCreate,
+			s *dgo.Session,
+			option *dgo.ApplicationCommandInteractionDataOption,
+		) {
 			handleRemindView(
 				i,
 				s,
 			)
-		case "delete":
+		},
+	},
+	{
+		Name: "delete",
+		Callback: func(
+			i *dgo.InteractionCreate,
+			s *dgo.Session,
+			option *dgo.ApplicationCommandInteractionDataOption,
+		) {
 			handleRemindDelete(
 				option.Options[0].Value.(float64),
 				i,
 				s,
 			)
-		}
-	}
+		},
+	},
 }
 
 func handleRemindSet(title string, duration float64, i *dgo.InteractionCreate, s *dgo.Session) {
@@ -127,6 +146,8 @@ func RegesterRemind(client *dgo.Session, guildID string) types.Handler {
 	)
 	// Return Handler
 	return types.Handler{
-		Name: "remind", Callback: HandleRemind,
+		Name: "remind", Callback: func(i *dgo.InteractionCreate, s *dgo.Session) {
+			utils.MatchSubcommand(i, s, remindSubcommands)
+		},
 	}
 }
