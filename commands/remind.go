@@ -19,43 +19,31 @@ var reminders []remind
 var remindSubcommands []types.Subcommand = []types.Subcommand{
 	{
 		Name: "set",
-		Callback: func(
-			i *dgo.InteractionCreate,
-			s *dgo.Session,
-			option *dgo.ApplicationCommandInteractionDataOption,
-		) {
+		Callback: func(parms types.SubcommandParms) {
 			handleRemindSet(
-				option.Options[0].Value.(string),
-				option.Options[1].Value.(float64),
-				i,
-				s,
+				parms.Option.Options[0].Value.(string),
+				parms.Option.Options[1].Value.(float64),
+				parms.Interaction,
+				parms.Session,
 			)
 		},
 	},
 	{
 		Name: "view",
-		Callback: func(
-			i *dgo.InteractionCreate,
-			s *dgo.Session,
-			option *dgo.ApplicationCommandInteractionDataOption,
-		) {
+		Callback: func(parms types.SubcommandParms) {
 			handleRemindView(
-				i,
-				s,
+				parms.Interaction,
+				parms.Session,
 			)
 		},
 	},
 	{
 		Name: "delete",
-		Callback: func(
-			i *dgo.InteractionCreate,
-			s *dgo.Session,
-			option *dgo.ApplicationCommandInteractionDataOption,
-		) {
+		Callback: func(parms types.SubcommandParms) {
 			handleRemindDelete(
-				option.Options[0].Value.(float64),
-				i,
-				s,
+				parms.Option.Options[0].Value.(float64),
+				parms.Interaction,
+				parms.Session,
 			)
 		},
 	},

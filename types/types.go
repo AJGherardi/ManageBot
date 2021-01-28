@@ -10,8 +10,15 @@ type Handler struct {
 	Callback func(i *dgo.InteractionCreate, s *dgo.Session)
 }
 
-// Handler holds a refrence to the handler function for a application command
+// Subcommand holds a refrence to the handler function for a application subcommand
 type Subcommand struct {
 	Name     string
-	Callback func(i *dgo.InteractionCreate, s *dgo.Session, option *dgo.ApplicationCommandInteractionDataOption)
+	Callback func(parms SubcommandParms)
+}
+
+// SubcommandParms holds all neccesary parms to invoke a subcommand
+type SubcommandParms struct {
+	Interaction *dgo.InteractionCreate
+	Session     *dgo.Session
+	Option      *dgo.ApplicationCommandInteractionDataOption
 }

@@ -9,46 +9,34 @@ import (
 var channelSubcommands []types.Subcommand = []types.Subcommand{
 	{
 		Name: "create",
-		Callback: func(
-			i *dgo.InteractionCreate,
-			s *dgo.Session,
-			option *dgo.ApplicationCommandInteractionDataOption,
-		) {
+		Callback: func(parms types.SubcommandParms) {
 			handleCreateChannel(
-				option.Options[0].Value.(string),
-				option.Options[1].Value.(string),
-				option.Options[2].Value.(float64),
-				option.Options[3].Value.(bool),
-				i,
-				s,
+				parms.Option.Options[0].Value.(string),
+				parms.Option.Options[1].Value.(string),
+				parms.Option.Options[2].Value.(float64),
+				parms.Option.Options[3].Value.(bool),
+				parms.Interaction,
+				parms.Session,
 			)
 		},
 	},
 	{
 		Name: "delete",
-		Callback: func(
-			i *dgo.InteractionCreate,
-			s *dgo.Session,
-			option *dgo.ApplicationCommandInteractionDataOption,
-		) {
+		Callback: func(parms types.SubcommandParms) {
 			handleDeleteChannel(
-				option.Options[0].Value.(string),
-				i,
-				s,
+				parms.Option.Options[0].Value.(string),
+				parms.Interaction,
+				parms.Session,
 			)
 		},
 	},
 	{
 		Name: "create-group",
-		Callback: func(
-			i *dgo.InteractionCreate,
-			s *dgo.Session,
-			option *dgo.ApplicationCommandInteractionDataOption,
-		) {
+		Callback: func(parms types.SubcommandParms) {
 			handleCreateChannelGroup(
-				option.Options[0].Value.(string),
-				i,
-				s,
+				parms.Option.Options[0].Value.(string),
+				parms.Interaction,
+				parms.Session,
 			)
 		},
 	},

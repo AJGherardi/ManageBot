@@ -9,145 +9,113 @@ import (
 var roleSubcommands []types.Subcommand = []types.Subcommand{
 	{
 		Name: "assign",
-		Callback: func(
-			i *dgo.InteractionCreate,
-			s *dgo.Session,
-			option *dgo.ApplicationCommandInteractionDataOption,
-		) {
+		Callback: func(parms types.SubcommandParms) {
 			handleAssignRole(
-				option.Options[0].Value.(string),
-				option.Options[1].Value.(string),
-				i,
-				s,
+				parms.Option.Options[0].Value.(string),
+				parms.Option.Options[1].Value.(string),
+				parms.Interaction,
+				parms.Session,
 			)
 		},
 	},
 	{
 		Name: "revoke",
-		Callback: func(
-			i *dgo.InteractionCreate,
-			s *dgo.Session,
-			option *dgo.ApplicationCommandInteractionDataOption,
-		) {
+		Callback: func(parms types.SubcommandParms) {
 			handleRevokeRole(
-				option.Options[0].Value.(string),
-				option.Options[1].Value.(string),
-				i,
-				s,
+				parms.Option.Options[0].Value.(string),
+				parms.Option.Options[1].Value.(string),
+				parms.Interaction,
+				parms.Session,
 			)
 		},
 	},
 	{
 		Name: "create",
-		Callback: func(
-			i *dgo.InteractionCreate,
-			s *dgo.Session,
-			option *dgo.ApplicationCommandInteractionDataOption,
-		) {
+		Callback: func(parms types.SubcommandParms) {
 			handleCreateRole(
-				option.Options[0].Value.(string),
-				i,
-				s,
+				parms.Option.Options[0].Value.(string),
+				parms.Interaction,
+				parms.Session,
 			)
 		},
 	},
 	{
 		Name: "delete",
-		Callback: func(
-			i *dgo.InteractionCreate,
-			s *dgo.Session,
-			option *dgo.ApplicationCommandInteractionDataOption,
-		) {
+		Callback: func(parms types.SubcommandParms) {
 			handleDeleteRole(
-				option.Options[0].Value.(string),
-				i,
-				s,
+				parms.Option.Options[0].Value.(string),
+				parms.Interaction,
+				parms.Session,
 			)
 
 		},
 	},
 	{
 		Name: "general-permissions-set",
-		Callback: func(
-			i *dgo.InteractionCreate,
-			s *dgo.Session,
-			option *dgo.ApplicationCommandInteractionDataOption,
-		) {
+		Callback: func(parms types.SubcommandParms) {
 			handleRoleGeneralPermissionsSet(
-				option.Options[0].Value.(string),
-				option.Options[1].Value.(bool),
-				option.Options[2].Value.(bool),
-				option.Options[3].Value.(bool),
-				option.Options[4].Value.(bool),
-				option.Options[5].Value.(bool),
-				option.Options[6].Value.(bool),
-				option.Options[7].Value.(bool),
-				option.Options[8].Value.(bool),
-				i,
-				s,
+				parms.Option.Options[0].Value.(string),
+				parms.Option.Options[1].Value.(bool),
+				parms.Option.Options[2].Value.(bool),
+				parms.Option.Options[3].Value.(bool),
+				parms.Option.Options[4].Value.(bool),
+				parms.Option.Options[5].Value.(bool),
+				parms.Option.Options[6].Value.(bool),
+				parms.Option.Options[7].Value.(bool),
+				parms.Option.Options[8].Value.(bool),
+				parms.Interaction,
+				parms.Session,
 			)
 		},
 	},
 	{
 		Name: "membership-permissions-set",
-		Callback: func(
-			i *dgo.InteractionCreate,
-			s *dgo.Session,
-			option *dgo.ApplicationCommandInteractionDataOption,
-		) {
+		Callback: func(parms types.SubcommandParms) {
 			handleRoleMembershipPermissionsSet(
-				option.Options[0].Value.(string),
-				option.Options[1].Value.(bool),
-				option.Options[2].Value.(bool),
-				option.Options[3].Value.(bool),
-				option.Options[4].Value.(bool),
-				option.Options[5].Value.(bool),
-				i,
-				s,
+				parms.Option.Options[0].Value.(string),
+				parms.Option.Options[1].Value.(bool),
+				parms.Option.Options[2].Value.(bool),
+				parms.Option.Options[3].Value.(bool),
+				parms.Option.Options[4].Value.(bool),
+				parms.Option.Options[5].Value.(bool),
+				parms.Interaction,
+				parms.Session,
 			)
 		},
 	},
 	{
 		Name: "text-permissions-set",
-		Callback: func(
-			i *dgo.InteractionCreate,
-			s *dgo.Session,
-			option *dgo.ApplicationCommandInteractionDataOption,
-		) {
+		Callback: func(parms types.SubcommandParms) {
 			handleRoleTextPermissionsSet(
-				option.Options[0].Value.(string),
-				option.Options[1].Value.(bool),
-				option.Options[2].Value.(bool),
-				option.Options[3].Value.(bool),
-				option.Options[4].Value.(bool),
-				option.Options[5].Value.(bool),
-				option.Options[6].Value.(bool),
-				option.Options[7].Value.(bool),
-				option.Options[8].Value.(bool),
-				option.Options[9].Value.(bool),
-				i,
-				s,
+				parms.Option.Options[0].Value.(string),
+				parms.Option.Options[1].Value.(bool),
+				parms.Option.Options[2].Value.(bool),
+				parms.Option.Options[3].Value.(bool),
+				parms.Option.Options[4].Value.(bool),
+				parms.Option.Options[5].Value.(bool),
+				parms.Option.Options[6].Value.(bool),
+				parms.Option.Options[7].Value.(bool),
+				parms.Option.Options[8].Value.(bool),
+				parms.Option.Options[9].Value.(bool),
+				parms.Interaction,
+				parms.Session,
 			)
 		},
 	},
 	{
 		Name: "voice-permissions-set",
-		Callback: func(
-			i *dgo.InteractionCreate,
-			s *dgo.Session,
-			option *dgo.ApplicationCommandInteractionDataOption,
-		) {
+		Callback: func(parms types.SubcommandParms) {
 			handleRoleVoicePermissionsSet(
-				option.Options[0].Value.(string),
-				option.Options[1].Value.(bool),
-				option.Options[2].Value.(bool),
-				option.Options[3].Value.(bool),
-				option.Options[4].Value.(bool),
-				option.Options[5].Value.(bool),
-				option.Options[6].Value.(bool),
-				option.Options[7].Value.(bool),
-				i,
-				s,
+				parms.Option.Options[0].Value.(string),
+				parms.Option.Options[1].Value.(bool),
+				parms.Option.Options[2].Value.(bool),
+				parms.Option.Options[3].Value.(bool),
+				parms.Option.Options[4].Value.(bool),
+				parms.Option.Options[5].Value.(bool),
+				parms.Option.Options[6].Value.(bool),
+				parms.Option.Options[7].Value.(bool),
+				parms.Interaction,
+				parms.Session,
 			)
 		},
 	},

@@ -15,7 +15,11 @@ func SendResponse(response string, i *dgo.InteractionCreate, s *dgo.Session) {
 func MatchSubcommand(i *dgo.InteractionCreate, s *dgo.Session, subcommands []types.Subcommand) {
 	for _, subcommand := range subcommands {
 		if subcommand.Name == i.Interaction.Data.Options[0].Name {
-			subcommand.Callback(i, s, i.Data.Options[0])
+			subcommand.Callback(types.SubcommandParms{
+				Interaction: i,
+				Session:     s,
+				Option:      i.Data.Options[0],
+			})
 		}
 	}
 }
