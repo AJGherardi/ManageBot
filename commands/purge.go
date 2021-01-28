@@ -22,7 +22,7 @@ func HandlePurge(number float64, i *dgo.InteractionCreate, s *dgo.Session) {
 	utils.SendResponse("Removed "+fmt.Sprint(number)+" messages", i, s)
 }
 
-// RegesterPurge adds the kick / command
+// RegesterPurge adds the purge / command
 func RegesterPurge(client *dgo.Session, guildID string) types.Handler {
 	client.ApplicationCommandCreate(
 		"",
