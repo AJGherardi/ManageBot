@@ -1,9 +1,12 @@
 package commands
 
 import (
+	"fmt"
+
 	"github.com/AJGherardi/ManageBot/types"
 	"github.com/AJGherardi/ManageBot/utils"
 	dgo "github.com/bwmarrin/discordgo"
+	embed "github.com/clinet/discordgo-embed"
 )
 
 var roleSubcommands []types.Subcommand = []types.Subcommand{
@@ -50,6 +53,17 @@ var roleSubcommands []types.Subcommand = []types.Subcommand{
 
 		},
 	},
+	{
+		Name: "view-permissions",
+		Callback: func(parms types.SubcommandParms) {
+			handleRoleViewPermissions(
+				parms.Option.Options[0].Value.(string),
+				parms.Interaction,
+				parms.Session,
+			)
+		},
+	},
+
 	{
 		Name: "general-permissions-set",
 		Callback: func(parms types.SubcommandParms) {
@@ -119,6 +133,82 @@ var roleSubcommands []types.Subcommand = []types.Subcommand{
 			)
 		},
 	},
+}
+
+func checkPermission(permissions int, permission int) bool {
+	permited := (permissions & permission) == permission
+	return permited
+}
+
+func handleRoleViewPermissions(roleID string, i *dgo.InteractionCreate, s *dgo.Session) {
+	// Get role from parms
+	role, _ := s.State.Role(i.GuildID, roleID)
+	// Get permisisons
+	permissionViewChannel := checkPermission(role.Permissions, dgo.PermissionViewChannel)
+	permissionManageChannels := checkPermission(role.Permissions, dgo.PermissionManageChannels)
+	permissionManageRoles := checkPermission(role.Permissions, dgo.PermissionManageRoles)
+	permissionManageEmojis := checkPermission(role.Permissions, dgo.PermissionManageEmojis)
+	permissionViewAuditLogs := checkPermission(role.Permissions, dgo.PermissionViewAuditLogs)
+	permissionManageWebhooks := checkPermission(role.Permissions, dgo.PermissionManageWebhooks)
+	permissionManageServer := checkPermission(role.Permissions, dgo.PermissionManageServer)
+	permissionAdministrator := checkPermission(role.Permissions, dgo.PermissionAdministrator)
+	permissionCreateInstantInvite := checkPermission(role.Permissions, dgo.PermissionCreateInstantInvite)
+	permissionChangeNickname := checkPermission(role.Permissions, dgo.PermissionChangeNickname)
+	permissionManageNicknames := checkPermission(role.Permissions, dgo.PermissionManageNicknames)
+	permissionKickMembers := checkPermission(role.Permissions, dgo.PermissionKickMembers)
+	permissionBanMembers := checkPermission(role.Permissions, dgo.PermissionBanMembers)
+	permissionSendMessages := checkPermission(role.Permissions, dgo.PermissionSendMessages)
+	permissionEmbedLinks := checkPermission(role.Permissions, dgo.PermissionEmbedLinks)
+	permissionAttachFiles := checkPermission(role.Permissions, dgo.PermissionAttachFiles)
+	permissionAddReactions := checkPermission(role.Permissions, dgo.PermissionAddReactions)
+	permissionUseExternalEmojis := checkPermission(role.Permissions, dgo.PermissionUseExternalEmojis)
+	permissionMentionEveryone := checkPermission(role.Permissions, dgo.PermissionMentionEveryone)
+	permissionManageMessages := checkPermission(role.Permissions, dgo.PermissionManageMessages)
+	permissionReadMessageHistory := checkPermission(role.Permissions, dgo.PermissionReadMessageHistory)
+	permissionSendTTSMessages := checkPermission(role.Permissions, dgo.PermissionSendTTSMessages)
+	permissionVoiceConnect := checkPermission(role.Permissions, dgo.PermissionVoiceConnect)
+	permissionVoiceSpeak := checkPermission(role.Permissions, dgo.PermissionVoiceSpeak)
+	permissionVoiceUseVAD := checkPermission(role.Permissions, dgo.PermissionVoiceUseVAD)
+	permissionVoicePrioritySpeaker := checkPermission(role.Permissions, dgo.PermissionVoicePrioritySpeaker)
+	permissionVoiceMuteMembers := checkPermission(role.Permissions, dgo.PermissionVoiceMuteMembers)
+	permissionVoiceDeafenMembers := checkPermission(role.Permissions, dgo.PermissionVoiceDeafenMembers)
+	permissionVoiceMoveMembers := checkPermission(role.Permissions, dgo.PermissionVoiceMoveMembers)
+	// Send perms
+	s.ChannelMessageSendEmbed(i.ChannelID, embed.NewGenericEmbed(
+		"",
+		"Permissions for role "+role.Mention()+
+			"\n \n %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s ",
+		"permissionViewChannel: "+fmt.Sprint(permissionViewChannel)+"\n",
+		"permissionManageChannels: "+fmt.Sprint(permissionManageChannels)+"\n",
+		"permissionManageRoles: "+fmt.Sprint(permissionManageRoles)+"\n",
+		"permissionManageEmojis: "+fmt.Sprint(permissionManageEmojis)+"\n",
+		"permissionViewAuditLogs: "+fmt.Sprint(permissionViewAuditLogs)+"\n",
+		"permissionManageWebhooks: "+fmt.Sprint(permissionManageWebhooks)+"\n",
+		"permissionManageServer: "+fmt.Sprint(permissionManageServer)+"\n",
+		"permissionAdministrator: "+fmt.Sprint(permissionAdministrator)+"\n",
+		"permissionCreateInstantInvite: "+fmt.Sprint(permissionCreateInstantInvite)+"\n",
+		"permissionChangeNickname: "+fmt.Sprint(permissionChangeNickname)+"\n",
+		"permissionManageNicknames: "+fmt.Sprint(permissionManageNicknames)+"\n",
+		"permissionKickMembers: "+fmt.Sprint(permissionKickMembers)+"\n",
+		"permissionBanMembers: "+fmt.Sprint(permissionBanMembers)+"\n",
+		"permissionSendMessages: "+fmt.Sprint(permissionSendMessages)+"\n",
+		"permissionEmbedLinks: "+fmt.Sprint(permissionEmbedLinks)+"\n",
+		"permissionAttachFiles: "+fmt.Sprint(permissionAttachFiles)+"\n",
+		"permissionAddReactions: "+fmt.Sprint(permissionAddReactions)+"\n",
+		"permissionUseExternalEmojis: "+fmt.Sprint(permissionUseExternalEmojis)+"\n",
+		"permissionMentionEveryone: "+fmt.Sprint(permissionMentionEveryone)+"\n",
+		"permissionManageMessages: "+fmt.Sprint(permissionManageMessages)+"\n",
+		"permissionReadMessageHistory: "+fmt.Sprint(permissionReadMessageHistory)+"\n",
+		"permissionSendTTSMessages: "+fmt.Sprint(permissionSendTTSMessages)+"\n",
+		"permissionVoiceConnect: "+fmt.Sprint(permissionVoiceConnect)+"\n",
+		"permissionVoiceSpeak: "+fmt.Sprint(permissionVoiceSpeak)+"\n",
+		"permissionVoiceUseVAD: "+fmt.Sprint(permissionVoiceUseVAD)+"\n",
+		"permissionVoicePrioritySpeaker: "+fmt.Sprint(permissionVoicePrioritySpeaker)+"\n",
+		"permissionVoiceMuteMembers: "+fmt.Sprint(permissionVoiceMuteMembers)+"\n",
+		"permissionVoiceDeafenMembers: "+fmt.Sprint(permissionVoiceDeafenMembers)+"\n",
+		"permissionVoiceMoveMembers: "+fmt.Sprint(permissionVoiceMoveMembers)+"\n",
+	))
+
 }
 
 func handleAssignRole(userID, roleID string, i *dgo.InteractionCreate, s *dgo.Session) {
@@ -379,6 +469,19 @@ func RegesterRoles(client *dgo.Session, guildID string) types.Handler {
 							Type:        dgo.ApplicationCommandOptionRole,
 							Name:        "role",
 							Description: "Role to remove",
+							Required:    true,
+						},
+					},
+				},
+				{
+					Type:        dgo.ApplicationCommandOptionSubCommand,
+					Name:        "view-permissions",
+					Description: "Displays a roles permissions",
+					Options: []*dgo.ApplicationCommandOption{
+						{
+							Type:        dgo.ApplicationCommandOptionRole,
+							Name:        "role",
+							Description: "Role to check",
 							Required:    true,
 						},
 					},
