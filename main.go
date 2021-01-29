@@ -13,6 +13,12 @@ import (
 func main() {
 	// Creates a new client object
 	client, _ := dgo.New("Bot " + botToken)
+	// Set intents
+	client.Identify.Intents = dgo.MakeIntent(
+		dgo.IntentsAllWithoutPrivileged |
+			dgo.IntentsGuildPresences |
+			dgo.IntentsGuildMembers,
+	)
 	// Opens the connection
 	client.Open()
 	// Remove all commands
