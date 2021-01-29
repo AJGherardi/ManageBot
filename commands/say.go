@@ -6,6 +6,15 @@ import (
 	dgo "github.com/bwmarrin/discordgo"
 )
 
+type reactionRole struct {
+	EmojiID   string
+	MessageID string
+	RoleID    string
+	GuildID   string
+}
+
+var reactionRoles []reactionRole
+
 var saySubcommands []types.Subcommand = []types.Subcommand{
 	{
 		Name: "message",
@@ -32,6 +41,16 @@ var saySubcommands []types.Subcommand = []types.Subcommand{
 	},
 }
 
+func reactionHandler(s *dgo.Session, reaction *dgo.MessageReactionAdd) {
+	for _, rr := range reactionRoles {
+		if rr.EmojiID == reaction.Emoji.Name {
+			if reaction.MessageID == rr.MessageID {
+				s.GuildMemberRoleAdd(rr.GuildID, reaction.UserID, rr.RoleID)
+			}
+		}
+	}
+}
+
 // handleMessage handles a say message command
 func handleMessage(message string, number float64, i *dgo.InteractionCreate, s *dgo.Session) {
 	for r := 0; r < int(number); r++ {
@@ -42,7 +61,15 @@ func handleMessage(message string, number float64, i *dgo.InteractionCreate, s *
 // handleReactionRole handles a say reaction-role command
 func handleReactionRole(message, emoji, roleID string, i *dgo.InteractionCreate, s *dgo.Session) {
 	m := utils.SendResponse(message, i, s)
+	// Add initial reaction
 	s.MessageReactionAdd(i.ChannelID, m.ID, emoji)
+	// Add reaction role
+	reactionRoles = append(reactionRoles, reactionRole{
+		EmojiID:   emoji,
+		MessageID: m.ID,
+		RoleID:    roleID,
+		GuildID:   i.GuildID,
+	})
 }
 
 // RegesterSay adds the say / command and its subcommands
@@ -102,9 +129,7 @@ func RegesterSay(client *dgo.Session, guildID string) types.Handler {
 		guildID,
 	)
 	// Add reaction handler
-	client.AddHandler(func(s *dgo.Session, reaction *dgo.MessageReactionAdd) {
-
-	})
+	client.AddHandler(reactionHandler)
 	// Return Handler
 	return types.Handler{
 		Name: "say", Callback: func(i *dgo.InteractionCreate, s *dgo.Session) {
