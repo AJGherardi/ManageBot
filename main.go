@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"time"
 
 	"github.com/AJGherardi/ManageBot/types"
@@ -10,7 +11,14 @@ import (
 
 // botToken and guildID must be added to consts.go
 
+var (
+	botToken, guildID string
+)
+
 func main() {
+	// Get env vars
+	botToken = os.Getenv("TOKEN")
+	guildID = os.Getenv("GUILD_ID")
 	// Creates a new client object
 	client, _ := dgo.New("Bot " + botToken)
 	// Set intents
