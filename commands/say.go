@@ -22,6 +22,7 @@ var saySubcommands []types.Subcommand = []types.Subcommand{
 			handleMessage(
 				parms.Option.Options[0].Value.(string),
 				parms.Option.Options[1].Value.(float64),
+				parms.Option.Options[2].Value.(bool),
 				parms.Interaction,
 				parms.Session,
 			)
@@ -52,9 +53,13 @@ func reactionHandler(s *dgo.Session, reaction *dgo.MessageReactionAdd) {
 }
 
 // handleMessage handles a say message command
-func handleMessage(message string, number float64, i *dgo.InteractionCreate, s *dgo.Session) {
+func handleMessage(message string, number float64, embed bool, i *dgo.InteractionCreate, s *dgo.Session) {
 	for r := 0; r < int(number); r++ {
-		utils.SendResponse(message, i, s)
+		if embed {
+			utils.SendResponse(message, i, s)
+		} else {
+			s.ChannelMessageSend(i.ChannelID, message)
+		}
 	}
 }
 
@@ -95,6 +100,12 @@ func RegesterSay(client *dgo.Session, guildID string) types.Handler {
 							Type:        dgo.ApplicationCommandOptionInteger,
 							Name:        "Repeat",
 							Description: "Number of times to repeat",
+							Required:    true,
+						},
+						{
+							Type:        dgo.ApplicationCommandOptionBoolean,
+							Name:        "Embed",
+							Description: "Sends message in a embed",
 							Required:    true,
 						},
 					},
