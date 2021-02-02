@@ -8,6 +8,13 @@ services:
       - "8080:8080"
     env_file:
       - vars.env
-
-  redis:
-    image: "redis:alpine"
+    depends_on:
+      - mongo
+  mongo:
+      image: mongo:4.4.1
+      restart: always
+      command: --configExpand rest
+      ports:
+          - 27017:27017
+      logging:
+          driver: none
