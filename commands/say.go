@@ -29,6 +29,19 @@ var saySubcommands []types.Subcommand = []types.Subcommand{
 		},
 	},
 	{
+		Name: "dm",
+		Callback: func(parms types.SubcommandParms) {
+			handleDM(
+				parms.Option.Options[0].Value.(string),
+				parms.Option.Options[1].Value.(string),
+				parms.Option.Options[2].Value.(float64),
+				parms.Option.Options[3].Value.(bool),
+				parms.Interaction,
+				parms.Session,
+			)
+		},
+	},
+	{
 		Name: "reaction-role",
 		Callback: func(parms types.SubcommandParms) {
 			handleReactionRole(
@@ -48,6 +61,18 @@ func reactionHandler(s *dgo.Session, reaction *dgo.MessageReactionAdd) {
 			if reaction.MessageID == rr.MessageID {
 				s.GuildMemberRoleAdd(rr.GuildID, reaction.UserID, rr.RoleID)
 			}
+		}
+	}
+}
+
+// handleDM handles a say dm command
+func handleDM(userID, message string, number float64, embed bool, i *dgo.InteractionCreate, s *dgo.Session) {
+	channel, _ := s.UserChannelCreate(userID)
+	for r := 0; r < int(number); r++ {
+		if embed {
+			utils.SendDM(message, channel.ID, s)
+		} else {
+			s.ChannelMessageSend(channel.ID, message)
 		}
 	}
 }
@@ -100,6 +125,37 @@ func RegesterSay(client *dgo.Session, guildID string) types.Handler {
 							Type:        dgo.ApplicationCommandOptionInteger,
 							Name:        "Repeat",
 							Description: "Number of times to repeat",
+							Required:    true,
+						},
+						{
+							Type:        dgo.ApplicationCommandOptionBoolean,
+							Name:        "Embed",
+							Description: "Sends message in a embed",
+							Required:    true,
+						},
+					},
+				},
+				{
+					Type:        dgo.ApplicationCommandOptionSubCommand,
+					Name:        "dm",
+					Description: "Sends a dm",
+					Options: []*dgo.ApplicationCommandOption{
+						{
+							Type:        dgo.ApplicationCommandOptionUser,
+							Name:        "User",
+							Description: "User to dm",
+							Required:    true,
+						},
+						{
+							Type:        dgo.ApplicationCommandOptionString,
+							Name:        "Message",
+							Description: "Message to send",
+							Required:    true,
+						},
+						{
+							Type:        dgo.ApplicationCommandOptionInteger,
+							Name:        "Repeat",
+							Description: "Number of times to send",
 							Required:    true,
 						},
 						{
