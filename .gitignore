@@ -1,3 +1,4 @@
 consts.go
 .vscode
 __debug_bin
+*.env

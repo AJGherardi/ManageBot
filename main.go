@@ -9,8 +9,6 @@ import (
 	dgo "github.com/bwmarrin/discordgo"
 )
 
-// botToken and guildID must be added to consts.go
-
 var (
 	botToken, guildID string
 )
