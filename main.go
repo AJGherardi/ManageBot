@@ -1,36 +1,20 @@
 package main
 
 import (
-	"context"
 	"os"
 	"time"
 
 	"github.com/AJGherardi/ManageBot/types"
 	"github.com/AJGherardi/ManageBot/utils"
 	dgo "github.com/bwmarrin/discordgo"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
 var (
 	botToken, guildID string
 )
 
-func openDB() *mongo.Collection {
-	// Get db client
-	db, _ := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
-	// Connect with timeout
-	db.Connect(context.TODO())
-	// Test using ping
-	db.Ping(context.TODO(), readpref.Primary())
-	// Get collection ref
-	collection := db.Database("main").Collection("bot")
-	return collection
-}
-
 func main() {
-	// botData := openDB()
+
 	// Get env vars
 	botToken = os.Getenv("TOKEN")
 	guildID = os.Getenv("GUILD_ID")

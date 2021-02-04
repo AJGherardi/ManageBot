@@ -4,17 +4,20 @@ services:
     build:
       context: .
       dockerfile: dev.dockerfile
-    ports:
-      - "8080:8080"
     env_file:
       - vars.env
     depends_on:
-      - mongo
-  mongo:
-      image: mongo:4.4.1
-      restart: always
-      command: --configExpand rest
-      ports:
-          - 27017:27017
-      logging:
-          driver: none
+      - db
+    # Overrides default command so things don't shut down after the process ends.
+    command: sleep infinity
+
+    # Runs app on the same network as the database container, allows "forwardPorts" in devcontainer.json function.
+    network_mode: service:db
+
+  db:
+    image: mongo:latest
+    restart: unless-stopped
+    volumes:
+      - mongodb-data:/data/db
+volumes:
+  mongodb-data:
