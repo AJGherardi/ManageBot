@@ -1,31 +1,31 @@
-package main
+package store
 
 import (
 	"context"
 	"log"
 
+	"github.com/AJGherardi/ManageBot/types"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-// DB holds and abstracts access to the database and its collections
-type DB struct {
+// DB defines a interface for manageing application data
+type DB interface {
+	GetAllServers() []types.ServerData
+	AddServer(guildID, name string)
+	RemoveServer(guildID string)
+	ReplaceServer(guildID string, replacement types.ServerData)
+}
+
+// MongoDB holds and abstracts access to the mongo database and its collections
+type MongoDB struct {
 	servers *mongo.Collection
 }
 
-// Server holds all information that is needed to manage a discord guild
-type Server struct {
-	GuildID string `bson:"guildID,omitempty"`
-	Name    string `bson:"name,omitempty"`
-	// CommandHistory
-	// Tickets
-	// Warnings
-}
-
 // GetAllServers returns a slice of all servers
-func (d *DB) GetAllServers() []Server {
+func (d *MongoDB) GetAllServers() []types.ServerData {
 	// Get all documents
 	cursor, err := d.servers.Find(context.Background(), bson.M{})
 	if err != nil {
@@ -33,10 +33,10 @@ func (d *DB) GetAllServers() []Server {
 	}
 	defer cursor.Close(context.Background())
 	// Make servers slice
-	servers := []Server{}
+	servers := []types.ServerData{}
 	for cursor.Next(context.Background()) {
 		// Decode into server struct
-		var server Server
+		var server types.ServerData
 		if err = cursor.Decode(&server); err != nil {
 			log.Fatal(err)
 		}
@@ -47,16 +47,21 @@ func (d *DB) GetAllServers() []Server {
 }
 
 // AddServer inserts a server
-func (d *DB) AddServer(guildID, name string) {
-	d.servers.InsertOne(context.Background(), Server{
+func (d *MongoDB) AddServer(guildID, name string) {
+	d.servers.InsertOne(context.Background(), types.ServerData{
 		GuildID: guildID,
 		Name:    name,
 	})
 }
 
 // RemoveServer removes the server at the given guild id
-func (d *DB) RemoveServer(guildID string) {
-	d.servers.DeleteOne(context.Background(), Server{GuildID: guildID})
+func (d *MongoDB) RemoveServer(guildID string) {
+	d.servers.DeleteOne(context.Background(), types.ServerData{GuildID: guildID})
+}
+
+// ReplaceServer replaces the server at the given guild id
+func (d *MongoDB) ReplaceServer(guildID string, replacement types.ServerData) {
+	d.servers.ReplaceOne(context.Background(), types.ServerData{GuildID: guildID}, replacement)
 }
 
 // OpenDB returns the DB struct which is used to manage application data
@@ -69,5 +74,6 @@ func OpenDB() DB {
 	db.Ping(context.TODO(), readpref.Primary())
 	// Get collection ref
 	servers := db.Database("main").Collection("servers")
-	return DB{servers: servers}
+	mongoDb := MongoDB{servers: servers}
+	return &mongoDb
 }

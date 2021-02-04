@@ -22,3 +22,12 @@ type SubcommandParms struct {
 	Session     *dgo.Session
 	Option      *dgo.ApplicationCommandInteractionDataOption
 }
+
+// ServerData holds all information that is needed to manage a discord guild
+type ServerData struct {
+	GuildID string `bson:"guildID,omitempty"`
+	Name    string `bson:"name,omitempty"`
+	// CommandHistory
+	// Tickets
+	// Warnings
+}
