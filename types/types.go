@@ -31,3 +31,18 @@ type ServerData struct {
 	// Tickets
 	// Warnings
 }
+
+// GetGuildID returns the servers id
+func (s *ServerData) GetGuildID() string {
+	return s.GuildID
+}
+
+// ChangeName changes the servers name
+func (s *ServerData) ChangeName(name string) {
+	s.Name = name
+}
+
+// GetName retuens the servers name
+func (s *ServerData) GetName() string {
+	return s.Name
+}

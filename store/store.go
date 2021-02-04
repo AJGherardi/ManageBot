@@ -14,7 +14,8 @@ import (
 // DB defines a interface for manageing application data
 type DB interface {
 	GetAllServers() []types.ServerData
-	AddServer(guildID, name string)
+	GetServerByID(guildID string) types.ServerData
+	InsertServer(types.ServerData)
 	RemoveServer(guildID string)
 	ReplaceServer(guildID string, replacement types.ServerData)
 }
@@ -46,12 +47,17 @@ func (d *MongoDB) GetAllServers() []types.ServerData {
 	return servers
 }
 
-// AddServer inserts a server
-func (d *MongoDB) AddServer(guildID, name string) {
-	d.servers.InsertOne(context.Background(), types.ServerData{
-		GuildID: guildID,
-		Name:    name,
-	})
+// GetServerByID returns the server with the given guild id
+func (d *MongoDB) GetServerByID(guildID string) types.ServerData {
+	// Get document and decode
+	var server types.ServerData
+	d.servers.FindOne(context.Background(), types.ServerData{GuildID: guildID}).Decode(&server)
+	return server
+}
+
+// InsertServer inserts a server
+func (d *MongoDB) InsertServer(server types.ServerData) {
+	d.servers.InsertOne(context.Background(), server)
 }
 
 // RemoveServer removes the server at the given guild id
