@@ -11,13 +11,15 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
+// TODO: Implment locks
+
 // DB defines a interface for manageing application data
 type DB interface {
 	GetAllServers() []types.ServerData
-	GetServerByID(guildID string) types.ServerData
-	InsertServer(types.ServerData)
-	RemoveServer(guildID string)
-	ReplaceServer(guildID string, replacement types.ServerData)
+	OpenServer(guildID string) types.ServerData
+	CreateServer(types.ServerData)
+	DeleteServer(guildID string)
+	CloseServerWithReplacment(guildID string, replacement types.ServerData)
 }
 
 // MongoDB holds and abstracts access to the mongo database and its collections
@@ -47,26 +49,26 @@ func (d *MongoDB) GetAllServers() []types.ServerData {
 	return servers
 }
 
-// GetServerByID returns the server with the given guild id
-func (d *MongoDB) GetServerByID(guildID string) types.ServerData {
+// OpenServer returns the server with the given guild id
+func (d *MongoDB) OpenServer(guildID string) types.ServerData {
 	// Get document and decode
 	var server types.ServerData
 	d.servers.FindOne(context.Background(), types.ServerData{GuildID: guildID}).Decode(&server)
 	return server
 }
 
-// InsertServer inserts a server
-func (d *MongoDB) InsertServer(server types.ServerData) {
+// CreateServer inserts a server
+func (d *MongoDB) CreateServer(server types.ServerData) {
 	d.servers.InsertOne(context.Background(), server)
 }
 
-// RemoveServer removes the server at the given guild id
-func (d *MongoDB) RemoveServer(guildID string) {
+// DeleteServer removes the server at the given guild id
+func (d *MongoDB) DeleteServer(guildID string) {
 	d.servers.DeleteOne(context.Background(), types.ServerData{GuildID: guildID})
 }
 
-// ReplaceServer replaces the server at the given guild id
-func (d *MongoDB) ReplaceServer(guildID string, replacement types.ServerData) {
+// CloseServerWithReplacment replaces the server at the given guild id
+func (d *MongoDB) CloseServerWithReplacment(guildID string, replacement types.ServerData) {
 	d.servers.ReplaceOne(context.Background(), types.ServerData{GuildID: guildID}, replacement)
 }
 
