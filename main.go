@@ -4,6 +4,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/AJGherardi/ManageBot/store"
 	"github.com/AJGherardi/ManageBot/types"
 	"github.com/AJGherardi/ManageBot/utils"
 	dgo "github.com/bwmarrin/discordgo"
@@ -11,12 +12,15 @@ import (
 
 var (
 	botToken, guildID string
+	db                store.DB
 )
 
 func main() {
 	// Get env vars
 	botToken = os.Getenv("TOKEN")
 	guildID = os.Getenv("GUILD_ID")
+	// Open database
+	db = store.OpenDB()
 	// Creates a new client object
 	client, _ := dgo.New("Bot " + botToken)
 	// Set intents
