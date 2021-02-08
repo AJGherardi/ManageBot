@@ -20,6 +20,7 @@ func regesterCommands(client *dgo.Session, guildID string) []types.Handler {
 	statsHandler := commands.RegesterStats(client, guildID)
 	voteHandler := commands.RegesterVote(client, guildID)
 	warnHandler := commands.RegesterWarn(client, guildID)
+	muteHandler := commands.RegesterMute(client, guildID)
 	return []types.Handler{
 		channelHandler,
 		initHandler,
@@ -33,5 +34,6 @@ func regesterCommands(client *dgo.Session, guildID string) []types.Handler {
 		statsHandler,
 		voteHandler,
 		warnHandler,
+		muteHandler,
 	}
 }
