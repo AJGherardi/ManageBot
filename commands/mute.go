@@ -24,7 +24,7 @@ func HandleMute(userID string, roleID string, duration float64, i *dgo.Interacti
 			// Removes mute from user
 			s.GuildMemberRoleRemove(i.GuildID, user.ID, role.ID)
 		},
-	
+	)
 
 }
 
