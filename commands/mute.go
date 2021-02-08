@@ -43,6 +43,12 @@ func RegesterMute(client *dgo.Session, guildID string) types.Handler {
 					Required:    true,
 				},
 				{
+					Type:        dgo.ApplicationCommandOptionUser,
+					Name:        "RoleID",
+					Description: "Muted role",
+					Required:    true,
+				},
+				{
 					Type:        dgo.ApplicationCommandOptionInteger,
 					Name:        "Time",
 					Description: "Amount of time to mute user",
