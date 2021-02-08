@@ -7,24 +7,25 @@ import (
 	"github.com/AJGherardi/ManageBot/types"
 	"github.com/AJGherardi/ManageBot/utils"
 	dgo "github.com/bwmarrin/discordgo"
-	embed "github.com/clinet/discordgo-embed"
 )
 
 // HandleMute handles a mute command
-func HandleMute(userID, duration float64, i *dgo.InteractionCreate, s *dgo.Session) {
+func HandleMute(userID string, roleID string, duration float64, i *dgo.InteractionCreate, s *dgo.Session) {
 	// Get user from parms
 	user, _ := s.User(userID)
+	// Get role from parms
+	role, _ := s.State.Role(i.GuildID, roleID)
 	// Assign role to user
-	s.GuildMemberRoleAdd(i.GuildID, user.ID, muted.ID)
+	s.GuildMemberRoleAdd(i.GuildID, user.ID, role.ID)
 	utils.SendResponse("Muted "+user.Mention()+" for "+fmt.Sprint(duration)+" min", i, s)
 	// Add a timer for the mute
-	timer := time.AfterFunc(
+	time.AfterFunc(
 		(time.Duration(duration) * time.Minute), func() {
 			// Removes mute from user
-			s.GuildMemberRoleRemove(i.GuildID, user.ID, muted.ID)
-		}
+			s.GuildMemberRoleRemove(i.GuildID, user.ID, role.ID)
+		},
 	
-	
+
 }
 
 // RegesterMute adds the /mute command
@@ -56,7 +57,8 @@ func RegesterMute(client *dgo.Session, guildID string) types.Handler {
 		Name: "mute", Callback: func(i *dgo.InteractionCreate, s *dgo.Session) {
 			HandleMute(
 				i.Interaction.Data.Options[0].Value.(string),
-				i.Interaction.Data.Options[1].Value.(float64),
+				i.Interaction.Data.Options[2].Value.(string),
+				i.Interaction.Data.Options[3].Value.(float64),
 				i,
 				s,
 			)
