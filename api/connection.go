@@ -3,7 +3,6 @@ package api
 import (
 	"time"
 
-	"github.com/AJGherardi/ManageBot/types"
 	"github.com/AJGherardi/ManageBot/utils"
 	dgo "github.com/bwmarrin/discordgo"
 )
@@ -31,11 +30,15 @@ func ConnectToDiscord(botToken, guildID string) Connection {
 }
 
 // StartCommandHandler Regesters all commands and begines command routing
-func (c *Connection) StartCommandHandler(commands []types.StandaloneCommand, guildID string) {
-	// Regester all commands
-	for _, command := range commands {
-		command.Regester(c.client, guildID)
+func (c *Connection) StartCommandHandler(standaloneCommands []StandaloneCommand, parentCommands []ParentCommand, guildID string) {
+	// Regester all standalone commands
+	for _, standaloneCommand := range standaloneCommands {
+		standaloneCommand.Regester()
 	}
+	// Regester all parent commands
+	// for _, parentCommand := range parentCommands {
+	// parentCommand.Regester()
+	// }
 	handle := func(s *dgo.Session, i *dgo.InteractionCreate) {
 		// Makes a reaponse
 		responseData := &dgo.InteractionApplicationCommandResponseData{
@@ -66,8 +69,8 @@ func (c *Connection) StartCommandHandler(commands []types.StandaloneCommand, gui
 			utils.SendResponse("Not authorized", i, s)
 			return
 		}
-		// Route to appliction command handler
-		for _, handler := range commands {
+		// Route to appliction command handler if standalone command
+		for _, handler := range standaloneCommands {
 			if handler.Name() == i.Interaction.Data.Name {
 				handler.Callback(i, s)
 			}

@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"github.com/AJGherardi/ManageBot/api"
 	"github.com/AJGherardi/ManageBot/utils"
 	dgo "github.com/bwmarrin/discordgo"
 )
@@ -42,13 +43,6 @@ func (h *InitHandler) Callback(i *dgo.InteractionCreate, s *dgo.Session) {
 	utils.SendResponse("Server initialized", i, s)
 }
 
-func (h *InitHandler) Regester(client *dgo.Session, guildID string) {
-	client.ApplicationCommandCreate(
-		"",
-		&dgo.ApplicationCommand{
-			Name:        "init",
-			Description: "Adds internal channels and roles to server",
-		},
-		guildID,
-	)
+func (h *InitHandler) Regester() api.StandaloneCommandSinginture {
+	return api.MakeStandaloneCommandSinginture("init", "Adds internal channels and roles to server")
 }
