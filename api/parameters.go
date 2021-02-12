@@ -4,28 +4,10 @@ import (
 	dgo "github.com/bwmarrin/discordgo"
 )
 
-// SubcommandSinginture describes a subcommands to be registered with the discord api
-type SubcommandSinginture struct {
-	Name, Description string
-	Parms             []ParmSinginture
-}
-
-// ParentCommandSinginture describes a command with subcommands to be registered with the discord api
-type ParentCommandSinginture struct {
-	Name, Description string
-}
-
 // StandaloneCommandSinginture describes a command with no subcommands to be registered with the discord api
 type StandaloneCommandSinginture struct {
 	Name, Description string
 	Parms             []ParmSinginture
-}
-
-// ParmSinginture describes a paramater to be registered with the discord api
-type ParmSinginture struct {
-	Name, Description string
-	Type              uint8
-	Required          bool
 }
 
 // MakeStandaloneCommandSinginture Creates and returns a signiture for a StandaloneCommand
@@ -37,6 +19,11 @@ func MakeStandaloneCommandSinginture(name, description string, parms ...ParmSing
 	}
 }
 
+// ParentCommandSinginture describes a command with subcommands to be registered with the discord api
+type ParentCommandSinginture struct {
+	Name, Description string
+}
+
 // MakeParentCommandSinginture Creates and returns a signiture for a ParentCommand
 func MakeParentCommandSinginture(name, description string) ParentCommandSinginture {
 	return ParentCommandSinginture{
@@ -45,12 +32,40 @@ func MakeParentCommandSinginture(name, description string) ParentCommandSingintu
 	}
 }
 
+// SubcommandSinginture describes a subcommands to be registered with the discord api
+type SubcommandSinginture struct {
+	Name, Description string
+	Parms             []ParmSinginture
+}
+
 // MakeSubcommandSinginture Creates and returns a signiture for a Subcommand
 func MakeSubcommandSinginture(name, description string, parms ...ParmSinginture) SubcommandSinginture {
 	return SubcommandSinginture{
 		Name:        name,
 		Description: description,
 		Parms:       parms,
+	}
+}
+
+// ParmSinginture describes a paramater to be registered with the discord api
+type ParmSinginture interface {
+	Build() *dgo.ApplicationCommandOption
+}
+
+// UnconstrainedParmSinginture is a parm singinture that dose not provide any required choices
+type UnconstrainedParmSinginture struct {
+	Name, Description string
+	Type              uint8
+	Required          bool
+}
+
+// Build Converts a ParmSinginture to application command option
+func (p UnconstrainedParmSinginture) Build() *dgo.ApplicationCommandOption {
+	return &dgo.ApplicationCommandOption{
+		Name:        p.Name,
+		Description: p.Description,
+		Required:    p.Required,
+		Type:        dgo.ApplicationCommandOptionType(p.Type),
 	}
 }
 
@@ -85,10 +100,59 @@ func MakeRoleParmSinginture(name, description string, required bool) ParmSingint
 }
 
 func makeParmSingitureWithType(name, description string, required bool, parmType uint8) ParmSinginture {
-	return ParmSinginture{
+	return UnconstrainedParmSinginture{
 		Name:        name,
 		Description: description,
 		Required:    required,
 		Type:        parmType,
+	}
+}
+
+// ConstrainedParmSinginture is a parm singinture that has a list of required choices
+type ConstrainedParmSinginture struct {
+	Name, Description string
+	Type              uint8
+	Required          bool
+	Choices           []Choice
+}
+
+// Build Converts a ParmSinginture to application command option
+func (p ConstrainedParmSinginture) Build() *dgo.ApplicationCommandOption {
+	// Build choices
+	parmChoices := []*dgo.ApplicationCommandOptionChoice{}
+	for _, choice := range p.Choices {
+		parmChoices = append(parmChoices, choice.Build())
+	}
+	return &dgo.ApplicationCommandOption{
+		Name:        p.Name,
+		Description: p.Description,
+		Required:    p.Required,
+		Type:        dgo.ApplicationCommandOptionType(p.Type),
+		Choices:     parmChoices,
+	}
+}
+
+// Choice returns a name/value pair
+type Choice struct {
+	Name  string
+	Value interface{}
+}
+
+// Build converts a Choice to a Application command choice
+func (c Choice) Build() *dgo.ApplicationCommandOptionChoice {
+	return &dgo.ApplicationCommandOptionChoice{
+		Name:  c.Name,
+		Value: c.Value,
+	}
+}
+
+// MakeIntParmSingintureWithChoices returns a parm with required choices
+func MakeIntParmSingintureWithChoices(name, description string, required bool, choices ...Choice) ParmSinginture {
+	return ConstrainedParmSinginture{
+		Name:        name,
+		Description: description,
+		Required:    required,
+		Type:        uint8(dgo.ApplicationCommandOptionInteger),
+		Choices:     choices,
 	}
 }

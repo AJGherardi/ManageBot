@@ -136,12 +136,7 @@ func regesterParentCommands(c *Connection, parentCommands []ParentCommand, guild
 func convertToParmOptions(parms []ParmSinginture) []*dgo.ApplicationCommandOption {
 	options := []*dgo.ApplicationCommandOption{}
 	for _, parmSinginture := range parms {
-		options = append(options, &dgo.ApplicationCommandOption{
-			Name:        parmSinginture.Name,
-			Description: parmSinginture.Description,
-			Required:    parmSinginture.Required,
-			Type:        dgo.ApplicationCommandOptionType(parmSinginture.Type),
-		})
+		options = append(options, parmSinginture.Build())
 	}
 	return options
 }
