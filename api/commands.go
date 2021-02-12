@@ -18,7 +18,7 @@ type ParentCommand interface {
 	// Returns the name of the command which is used to match the command to its subcommands
 	Name() string
 	// Returns a list of the subcommands for this parent command
-	Subcommands()
+	Subcommands() []Subcommand
 	// Builds and returns a descscription of a parent command
 	// which is regestered at the same time as the parrent command
 	Regester() ParentCommandSinginture

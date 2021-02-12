@@ -1,8 +1,6 @@
 package api
 
 import (
-	"time"
-
 	"github.com/AJGherardi/ManageBot/utils"
 	dgo "github.com/bwmarrin/discordgo"
 )
@@ -12,7 +10,7 @@ type Connection struct {
 	client *dgo.Session
 }
 
-// ConnectToDiscord opens a new connection to discord
+// ConnectToDiscord Opens a new connection to discord
 func ConnectToDiscord(botToken, guildID string) Connection {
 	// Creates a new client object
 	client, _ := dgo.New("Bot " + botToken)
@@ -32,13 +30,10 @@ func ConnectToDiscord(botToken, guildID string) Connection {
 // StartCommandHandler Regesters all commands and begines command routing
 func (c *Connection) StartCommandHandler(standaloneCommands []StandaloneCommand, parentCommands []ParentCommand, guildID string) {
 	// Regester all standalone commands
-	for _, standaloneCommand := range standaloneCommands {
-		standaloneCommand.Regester()
-	}
+	regesterStandaloneCommands(c, standaloneCommands, guildID)
 	// Regester all parent commands
-	// for _, parentCommand := range parentCommands {
-	// parentCommand.Regester()
-	// }
+	regesterParentCommands(c, parentCommands, guildID)
+	// Make handler
 	handle := func(s *dgo.Session, i *dgo.InteractionCreate) {
 		// Makes a reaponse
 		responseData := &dgo.InteractionApplicationCommandResponseData{
@@ -50,8 +45,6 @@ func (c *Connection) StartCommandHandler(standaloneCommands []StandaloneCommand,
 			Type: dgo.InteractionResponseChannelMessage,
 			Data: responseData,
 		})
-		// Wait a half sec
-		time.Sleep(500 * time.Millisecond)
 		// Chack perms
 		var authorized bool
 		for _, roleID := range i.Interaction.Member.Roles {
@@ -70,14 +63,100 @@ func (c *Connection) StartCommandHandler(standaloneCommands []StandaloneCommand,
 			return
 		}
 		// Route to appliction command handler if standalone command
-		for _, handler := range standaloneCommands {
-			if handler.Name() == i.Interaction.Data.Name {
-				handler.Callback(i, s)
-			}
-		}
+		routeStandaloneCommand(standaloneCommands, i, s)
+		// Route to application command handler if parent command
+		routeParentCommand(parentCommands, i, s)
 	}
 	// Regester handler
 	c.client.AddHandler(handle)
+}
+
+func routeParentCommand(parentCommands []ParentCommand, i *dgo.InteractionCreate, s *dgo.Session) {
+	for _, parentCommand := range parentCommands {
+		// Match parent command
+		if parentCommand.Name() == i.Interaction.Data.Name {
+			// Match subcommand
+			for _, subcommand := range parentCommand.Subcommands() {
+				if subcommand.Name() == i.Interaction.Data.Options[0].Name {
+					subcommand.Callback(i, s)
+				}
+			}
+		}
+	}
+}
+
+func routeStandaloneCommand(standaloneCommands []StandaloneCommand, i *dgo.InteractionCreate, s *dgo.Session) {
+	for _, standaloneCommand := range standaloneCommands {
+		if standaloneCommand.Name() == i.Interaction.Data.Name {
+			standaloneCommand.Callback(i, s)
+		}
+	}
+}
+
+func regesterStandaloneCommands(c *Connection, standaloneCommands []StandaloneCommand, guildID string) {
+	for _, standaloneCommand := range standaloneCommands {
+		// Get command signature
+		standaloneCommandSinginture := standaloneCommand.Regester()
+		// Regester the command
+		c.client.ApplicationCommandCreate(
+			"",
+			&dgo.ApplicationCommand{
+				Name:        standaloneCommandSinginture.Name,
+				Description: standaloneCommandSinginture.Description,
+				Options:     convertToParmOptions(standaloneCommandSinginture.Parms),
+			},
+			guildID,
+		)
+	}
+}
+
+func regesterParentCommands(c *Connection, parentCommands []ParentCommand, guildID string) {
+	for _, parentCommand := range parentCommands {
+		// Get parent signature
+		parentCommandSinginture := parentCommand.Regester()
+		// Get subcommand singintures
+		subcommandSingintures := []SubcommandSinginture{}
+		for _, subcommand := range parentCommand.Subcommands() {
+			subcommandSinginture := subcommand.Regester()
+			subcommandSingintures = append(subcommandSingintures, subcommandSinginture)
+		}
+		// Regester the command
+		c.client.ApplicationCommandCreate(
+			"",
+			&dgo.ApplicationCommand{
+				Name:        parentCommandSinginture.Name,
+				Description: parentCommandSinginture.Description,
+				Options:     convertToSubcommandOptions(subcommandSingintures),
+			},
+			guildID,
+		)
+	}
+}
+
+func convertToParmOptions(parms []ParmSinginture) []*dgo.ApplicationCommandOption {
+	options := []*dgo.ApplicationCommandOption{}
+	for _, parmSinginture := range parms {
+		options = append(options, &dgo.ApplicationCommandOption{
+			Name:        parmSinginture.Name,
+			Description: parmSinginture.Description,
+			Required:    parmSinginture.Required,
+			Type:        dgo.ApplicationCommandOptionType(parmSinginture.Type),
+		})
+	}
+	return options
+}
+
+func convertToSubcommandOptions(subcommands []SubcommandSinginture) []*dgo.ApplicationCommandOption {
+	subcommandOptions := []*dgo.ApplicationCommandOption{}
+	for _, subcommandSinginture := range subcommands {
+		subcommandOptions = append(subcommandOptions, &dgo.ApplicationCommandOption{
+			Name:        subcommandSinginture.Name,
+			Description: subcommandSinginture.Description,
+			Type:        dgo.ApplicationCommandOptionSubCommand,
+			Options:     convertToParmOptions(subcommandSinginture.Parms),
+		})
+	}
+	return subcommandOptions
 }
 
 func deleteAllCommands(client *dgo.Session, guildID string) {
