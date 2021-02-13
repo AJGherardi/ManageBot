@@ -1,8 +1,6 @@
 package commands
 
 import (
-	"fmt"
-
 	"github.com/AJGherardi/ManageBot/api"
 	dgo "github.com/bwmarrin/discordgo"
 )
@@ -31,8 +29,15 @@ func (h *createHandler) Name() string {
 	return "create"
 }
 
-func (h *createHandler) Callback(i *dgo.InteractionCreate, s *dgo.Session) {
-	fmt.Println("Create called")
+func (h *createHandler) Callback(i api.SubcommandInvocation, s *dgo.Session) {
+	// channel, _ :=
+	s.GuildChannelCreateComplex(i.GetGuildID(), dgo.GuildChannelCreateData{
+		Name:     i.GetStringParm(0),
+		Type:     dgo.ChannelType(i.GetIntParm(2)),
+		ParentID: i.GetStringParm(1),
+		NSFW:     i.GetBoolParm(3),
+	})
+	// utils.SendResponse("Added channel "+channel.Mention(), i, s)
 }
 
 func (h *createHandler) Regester() api.SubcommandSinginture {
@@ -43,6 +48,7 @@ func (h *createHandler) Regester() api.SubcommandSinginture {
 		api.MakeIntParmSingintureWithChoices(
 			"Type", "Type of new channel", true,
 			api.Choice{Name: "Text", Value: dgo.ChannelTypeGuildText},
+			api.Choice{Name: "Voice", Value: dgo.ChannelTypeGuildVoice},
 		),
 		api.MakeBoolParmSinginture("NSFW", "Contains explicit material only applys to text channels", true),
 	)
@@ -54,8 +60,13 @@ func (h *createGroupHandler) Name() string {
 	return "create-group"
 }
 
-func (h *createGroupHandler) Callback(i *dgo.InteractionCreate, s *dgo.Session) {
-	fmt.Println("create-group called")
+func (h *createGroupHandler) Callback(i api.SubcommandInvocation, s *dgo.Session) {
+	// channel, _ :=
+	s.GuildChannelCreateComplex(i.GetGuildID(), dgo.GuildChannelCreateData{
+		Name: i.GetStringParm(0),
+		Type: dgo.ChannelTypeGuildCategory,
+	})
+	// utils.SendResponse("Added channel group "+channel.Mention(), i, s)
 }
 
 func (h *createGroupHandler) Regester() api.SubcommandSinginture {
@@ -71,8 +82,10 @@ func (h *deleteHandler) Name() string {
 	return "delete"
 }
 
-func (h *deleteHandler) Callback(i *dgo.InteractionCreate, s *dgo.Session) {
-	fmt.Println("delete called")
+func (h *deleteHandler) Callback(i api.SubcommandInvocation, s *dgo.Session) {
+	// channel, _ := s.Channel(i.GetStringParm(0))
+	s.ChannelDelete(i.GetStringParm(0))
+	// utils.SendResponse("Deleted channel "+channel.Name, i, s)
 }
 
 func (h *deleteHandler) Regester() api.SubcommandSinginture {

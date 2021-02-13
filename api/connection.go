@@ -78,7 +78,7 @@ func routeParentCommand(parentCommands []ParentCommand, i *dgo.InteractionCreate
 			// Match subcommand
 			for _, subcommand := range parentCommand.Subcommands() {
 				if subcommand.Name() == i.Interaction.Data.Options[0].Name {
-					subcommand.Callback(i, s)
+					subcommand.Callback(SubcommandInvocation{invocation: invocation{i: i}}, s)
 				}
 			}
 		}
@@ -88,7 +88,7 @@ func routeParentCommand(parentCommands []ParentCommand, i *dgo.InteractionCreate
 func routeStandaloneCommand(standaloneCommands []StandaloneCommand, i *dgo.InteractionCreate, s *dgo.Session) {
 	for _, standaloneCommand := range standaloneCommands {
 		if standaloneCommand.Name() == i.Interaction.Data.Name {
-			standaloneCommand.Callback(i, s)
+			standaloneCommand.Callback(StandaloneCommandInvocation{invocation: invocation{i: i}}, s)
 		}
 	}
 }
