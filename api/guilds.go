@@ -14,7 +14,12 @@ type Ban struct {
 	UserID string
 }
 
-func (c *Connection) GetGuild(guildID string) {}
+func (c *Connection) GetGuild(guildID string) Guild {
+	return Guild{
+		guildID: guildID,
+		c:       c,
+	}
+}
 
 func (g *Guild) GetChannelIDs() []string {
 	channels, _ := g.c.client.GuildChannels(g.guildID)
