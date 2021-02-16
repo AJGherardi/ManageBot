@@ -59,6 +59,11 @@ func (st *Channel) UnpinMessage(msgID string) {
 	st.c.client.ChannelMessageUnpin(st.channelID, msgID)
 }
 
+func (st *Channel) Mention() string {
+	channel, _ := st.c.client.State.Channel(st.channelID)
+	return channel.Mention()
+}
+
 // TODO: Implement
 // func (st *Channel) PermissionOverrideCreate() {}
 
@@ -79,6 +84,11 @@ func (c *Connection) GetCategory(channelID string) Category {
 func (st *Category) GetName() string {
 	channel, _ := st.c.client.Channel(st.channelID)
 	return channel.Name
+}
+
+func (st *Category) Mention() string {
+	channel, _ := st.c.client.State.Channel(st.channelID)
+	return channel.Mention()
 }
 
 // TODO: Implement
@@ -130,4 +140,9 @@ func (st *DMChannel) PinMessage(msgID string) {
 
 func (st *DMChannel) UnpinMessage(msgID string) {
 	st.c.client.ChannelMessageUnpin(st.channelID, msgID)
+}
+
+func (st *DMChannel) Mention() string {
+	channel, _ := st.c.client.State.Channel(st.channelID)
+	return channel.Mention()
 }

@@ -87,3 +87,8 @@ func (r *Role) CheckPermission(permission Permission) bool {
 	permited := (role.Permissions & int(permission)) == int(permission)
 	return permited
 }
+
+func (r *Role) Mention() string {
+	role, _ := r.c.client.State.Role(r.guildID, r.roleID)
+	return role.Mention()
+}

@@ -33,7 +33,8 @@ func (h *createHandler) Callback(i api.SubcommandInvocation, c api.Connection) {
 	guild := c.GetGuild(i.GetGuildID())
 	guild.CreateChannel(i.GetStringParm(0), i.GetStringParm(1), i.GetIntParm(2), i.GetBoolParm(3))
 	// Inform admin
-	// utils.SendResponse("Added channel "+channel.Mention(), i, s)
+	channel := c.GetChannel(i.GetChannelID())
+	channel.SendEmbedMessage("Added channel " + channel.Mention())
 }
 
 func (h *createHandler) Regester() api.SubcommandSinginture {
@@ -59,7 +60,9 @@ func (h *createGroupHandler) Name() string {
 func (h *createGroupHandler) Callback(i api.SubcommandInvocation, c api.Connection) {
 	guild := c.GetGuild(i.GetGuildID())
 	guild.CreateCategory(i.GetStringParm(0))
-	// utils.SendResponse("Added channel group "+channel.Mention(), i, s)
+	// Inform admin
+	category := c.GetChannel(i.GetChannelID())
+	category.SendEmbedMessage("Added channel group " + category.Mention())
 }
 
 func (h *createGroupHandler) Regester() api.SubcommandSinginture {
@@ -78,7 +81,9 @@ func (h *deleteHandler) Name() string {
 func (h *deleteHandler) Callback(i api.SubcommandInvocation, c api.Connection) {
 	guild := c.GetGuild(i.GetGuildID())
 	guild.DeleteChannel(i.GetStringParm(0))
-	// utils.SendResponse("Deleted channel "+channel.Name, i, s)
+	// Inform admin
+	channel := c.GetChannel(i.GetChannelID())
+	channel.SendEmbedMessage("Deleted channel " + channel.GetName())
 }
 
 func (h *deleteHandler) Regester() api.SubcommandSinginture {
