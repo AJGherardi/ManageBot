@@ -11,35 +11,20 @@ func (h *InitHandler) Name() string {
 	return "init"
 }
 
-func (h *InitHandler) Callback(i api.StandaloneCommandInvocation, s *dgo.Session) {
+func (h *InitHandler) Callback(i api.StandaloneCommandInvocation, c api.Connection) {
+	guild := c.GetGuild(i.GetGuildID())
 	// Make channels
-	s.GuildChannelCreateComplex(i.GetGuildID(), dgo.GuildChannelCreateData{
-		Name: "logs",
-		Type: dgo.ChannelTypeGuildText,
-		NSFW: false,
-	})
-	s.GuildChannelCreateComplex(i.GetGuildID(), dgo.GuildChannelCreateData{
-		Name: "reports",
-		Type: dgo.ChannelTypeGuildText,
-		NSFW: false,
-	})
-	s.GuildChannelCreateComplex(i.GetGuildID(), dgo.GuildChannelCreateData{
-		Name: "tickets",
-		Type: dgo.ChannelTypeGuildCategory,
-	})
-	s.GuildChannelCreateComplex(i.GetGuildID(), dgo.GuildChannelCreateData{
-		Name: "archives",
-		Type: dgo.ChannelTypeGuildCategory,
-	})
+	guild.CreateChannel("logs", "", int(dgo.ChannelTypeGuildText), false)
+	guild.CreateChannel("reports", "", int(dgo.ChannelTypeGuildText), false)
+	guild.CreateCategory("tickets")
+	guild.CreateCategory("archives")
 	// Make roles
-	moderator, _ := s.GuildRoleCreate(i.GetGuildID())
-	s.GuildRoleEdit(i.GetGuildID(), moderator.ID, "moderator", 50, false, 1543499751, true)
-	member, _ := s.GuildRoleCreate(i.GetGuildID())
-	s.GuildRoleEdit(i.GetGuildID(), member.ID, "member", 50, false, 3526209, true)
-	muted, _ := s.GuildRoleCreate(i.GetGuildID())
-	s.GuildRoleEdit(i.GetGuildID(), muted.ID, "muted", 50, false, 1024, true)
+	guild.CreateRole("moderator", 50, 1543499751, true)
+	guild.CreateRole("member", 50, 3526209, true)
+	guild.CreateRole("muted", 50, 1024, true)
 	// Inform admin
-	// utils.SendResponse("Server initialized", i, s)
+	channel := c.GetChannel(i.GetChannelID())
+	channel.SendEmbedMessage("Server initialized")
 }
 
 func (h *InitHandler) Regester() api.StandaloneCommandSinginture {

@@ -1,6 +1,7 @@
 package api
 
 // TODO: Deduplicate
+import embed "github.com/clinet/discordgo-embed"
 
 type Channel struct {
 	channelID string
@@ -26,6 +27,11 @@ func (st *Channel) GetParentID() string {
 
 func (st *Channel) SendMessage(text string) string {
 	msg, _ := st.c.client.ChannelMessageSend(st.channelID, text)
+	return msg.ID
+}
+
+func (st *Channel) SendEmbedMessage(text string) string {
+	msg, _ := st.c.client.ChannelMessageSendEmbed(st.channelID, embed.NewGenericEmbed("", text))
 	return msg.ID
 }
 

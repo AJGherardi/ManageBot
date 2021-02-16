@@ -29,14 +29,10 @@ func (h *createHandler) Name() string {
 	return "create"
 }
 
-func (h *createHandler) Callback(i api.SubcommandInvocation, s *dgo.Session) {
-	// channel, _ :=
-	s.GuildChannelCreateComplex(i.GetGuildID(), dgo.GuildChannelCreateData{
-		Name:     i.GetStringParm(0),
-		Type:     dgo.ChannelType(i.GetIntParm(2)),
-		ParentID: i.GetStringParm(1),
-		NSFW:     i.GetBoolParm(3),
-	})
+func (h *createHandler) Callback(i api.SubcommandInvocation, c api.Connection) {
+	guild := c.GetGuild(i.GetGuildID())
+	guild.CreateChannel(i.GetStringParm(0), i.GetStringParm(1), i.GetIntParm(2), i.GetBoolParm(3))
+	// Inform admin
 	// utils.SendResponse("Added channel "+channel.Mention(), i, s)
 }
 
@@ -60,12 +56,9 @@ func (h *createGroupHandler) Name() string {
 	return "create-group"
 }
 
-func (h *createGroupHandler) Callback(i api.SubcommandInvocation, s *dgo.Session) {
-	// channel, _ :=
-	s.GuildChannelCreateComplex(i.GetGuildID(), dgo.GuildChannelCreateData{
-		Name: i.GetStringParm(0),
-		Type: dgo.ChannelTypeGuildCategory,
-	})
+func (h *createGroupHandler) Callback(i api.SubcommandInvocation, c api.Connection) {
+	guild := c.GetGuild(i.GetGuildID())
+	guild.CreateCategory(i.GetStringParm(0))
 	// utils.SendResponse("Added channel group "+channel.Mention(), i, s)
 }
 
@@ -82,9 +75,9 @@ func (h *deleteHandler) Name() string {
 	return "delete"
 }
 
-func (h *deleteHandler) Callback(i api.SubcommandInvocation, s *dgo.Session) {
-	// channel, _ := s.Channel(i.GetStringParm(0))
-	s.ChannelDelete(i.GetStringParm(0))
+func (h *deleteHandler) Callback(i api.SubcommandInvocation, c api.Connection) {
+	guild := c.GetGuild(i.GetGuildID())
+	guild.DeleteChannel(i.GetStringParm(0))
 	// utils.SendResponse("Deleted channel "+channel.Name, i, s)
 }
 

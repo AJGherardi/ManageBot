@@ -124,8 +124,9 @@ func (g *Guild) DeleteChannel(channelID string) {
 	g.c.client.ChannelDelete(channelID)
 }
 
-func (g *Guild) CreateRole() string {
+func (g *Guild) CreateRole(name string, colorDecimal, permissionInt int, mentionable bool) string {
 	role, _ := g.c.client.GuildRoleCreate(g.guildID)
+	g.c.client.GuildRoleEdit(g.guildID, role.ID, name, colorDecimal, true, permissionInt, mentionable)
 	return role.ID
 }
 

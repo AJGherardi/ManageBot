@@ -7,7 +7,7 @@ type StandaloneCommand interface {
 	// Returns the name of the command which is used to match the command to its callback
 	Name() string
 	// Handels a invocation of this command
-	Callback(i StandaloneCommandInvocation, s *dgo.Session)
+	Callback(i StandaloneCommandInvocation, c Connection)
 	// Builds and returns a descscription of a application command and its parameters
 	// which is regestred with the discord api
 	Regester() StandaloneCommandSinginture
@@ -29,7 +29,7 @@ type Subcommand interface {
 	// Returns the name of the command which is used to match the subcommand to its callback
 	Name() string
 	// Handels a invocation of this command
-	Callback(i SubcommandInvocation, s *dgo.Session)
+	Callback(i SubcommandInvocation, c Connection)
 	// Builds and returns a descscription of a subcommand and its parameters
 	// which is regestered at the same time as the parrent command
 	Regester() SubcommandSinginture

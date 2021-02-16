@@ -1,7 +1,6 @@
 package api
 
 import (
-	"github.com/AJGherardi/ManageBot/utils"
 	dgo "github.com/bwmarrin/discordgo"
 )
 
@@ -37,36 +36,37 @@ func (c *Connection) StartCommandHandler(standaloneCommands []StandaloneCommand,
 		s.InteractionResponseDelete("", i.Interaction)
 		// Check if authorized
 		if authorized == false {
-			utils.SendResponse("Not authorized", i, s)
+			channel := c.GetChannel(i.ChannelID)
+			channel.SendMessage("Not Authorized")
 			return
 		}
 		// Route to appliction command handler if standalone command
-		routeStandaloneCommand(standaloneCommands, i, s)
+		routeStandaloneCommand(standaloneCommands, i, *c)
 		// Route to application command handler if parent command
-		routeParentCommand(parentCommands, i, s)
+		routeParentCommand(parentCommands, i, *c)
 	}
 	// Regester handler
 	c.client.AddHandler(handle)
 }
 
-func routeParentCommand(parentCommands []ParentCommand, i *dgo.InteractionCreate, s *dgo.Session) {
+func routeParentCommand(parentCommands []ParentCommand, i *dgo.InteractionCreate, c Connection) {
 	for _, parentCommand := range parentCommands {
 		// Match parent command
 		if parentCommand.Name() == i.Interaction.Data.Name {
 			// Match subcommand
 			for _, subcommand := range parentCommand.Subcommands() {
 				if subcommand.Name() == i.Interaction.Data.Options[0].Name {
-					subcommand.Callback(SubcommandInvocation{invocation: invocation{i: i}}, s)
+					subcommand.Callback(SubcommandInvocation{invocation: invocation{i: i}}, c)
 				}
 			}
 		}
 	}
 }
 
-func routeStandaloneCommand(standaloneCommands []StandaloneCommand, i *dgo.InteractionCreate, s *dgo.Session) {
+func routeStandaloneCommand(standaloneCommands []StandaloneCommand, i *dgo.InteractionCreate, c Connection) {
 	for _, standaloneCommand := range standaloneCommands {
 		if standaloneCommand.Name() == i.Interaction.Data.Name {
-			standaloneCommand.Callback(StandaloneCommandInvocation{invocation: invocation{i: i}}, s)
+			standaloneCommand.Callback(StandaloneCommandInvocation{invocation: invocation{i: i}}, c)
 		}
 	}
 }
