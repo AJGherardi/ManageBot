@@ -42,7 +42,7 @@ func (h *createHandler) Regester() api.SubcommandSinginture {
 		"create", "Adds a channel",
 		api.MakeStringParmSinginture("Name", "Name to give new channel", true),
 		api.MakeChannelParmSinginture("Category", "Category to add channel to", true),
-		api.MakeIntParmSingintureWithChoices(
+		api.MakeParmSingintureWithChoices(
 			"Type", "Type of new channel", true,
 			api.Choice{Name: "Text", Value: dgo.ChannelTypeGuildText},
 			api.Choice{Name: "Voice", Value: dgo.ChannelTypeGuildVoice},

@@ -29,6 +29,12 @@ func main() {
 func getCommands() ([]api.StandaloneCommand, []api.ParentCommand) {
 	return []api.StandaloneCommand{
 			&commands.InitHandler{},
+			&commands.InviteHandler{},
+			&commands.KickHandler{},
+			&commands.NicknameHandler{},
+			&commands.PurgeHandler{},
+			&commands.WarnHandler{},
+			&commands.StatsHandler{},
 		}, []api.ParentCommand{
 			&commands.ChannelHandler{},
 		}

@@ -146,8 +146,8 @@ func (c Choice) Build() *dgo.ApplicationCommandOptionChoice {
 	}
 }
 
-// MakeIntParmSingintureWithChoices returns a parm with required choices
-func MakeIntParmSingintureWithChoices(name, description string, required bool, choices ...Choice) ParmSinginture {
+// MakeParmSingintureWithChoices returns a parm with required choices
+func MakeParmSingintureWithChoices(name, description string, required bool, choices ...Choice) ParmSinginture {
 	return ConstrainedParmSinginture{
 		Name:        name,
 		Description: description,

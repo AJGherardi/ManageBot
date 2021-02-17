@@ -1,50 +1,27 @@
 package commands
 
 import (
-	"github.com/AJGherardi/ManageBot/types"
-	"github.com/AJGherardi/ManageBot/utils"
-	dgo "github.com/bwmarrin/discordgo"
+	"github.com/AJGherardi/ManageBot/api"
 )
 
-// HandleNickname handles a nickname command
-func HandleNickname(userID, newNickname string, i *dgo.InteractionCreate, s *dgo.Session) {
-	s.GuildMemberNickname(i.GuildID, userID, newNickname)
-	utils.SendResponse("Changed Nickname", i, s)
+// NicknameHandler handles a nickname command
+type NicknameHandler struct{}
+
+func (h *NicknameHandler) Name() string {
+	return "nickname"
 }
 
-// RegesterNickname adds the nickname / command
-func RegesterNickname(client *dgo.Session, guildID string) types.Handler {
-	client.ApplicationCommandCreate(
-		"",
-		&dgo.ApplicationCommand{
-			Name:        "nickname",
-			Description: "Changes a server members nickname",
-			Options: []*dgo.ApplicationCommandOption{
-				{
-					Type:        dgo.ApplicationCommandOptionUser,
-					Name:        "User",
-					Description: "User that will have nickname changed",
-					Required:    true,
-				},
-				{
-					Type:        dgo.ApplicationCommandOptionString,
-					Name:        "nickname",
-					Description: "New Nickname",
-					Required:    true,
-				},
-			},
-		},
-		guildID,
+func (h *NicknameHandler) Callback(i api.StandaloneCommandInvocation, c api.Connection) {
+	guild := c.GetGuild(i.GetGuildID())
+	guild.SetNickname(i.GetStringParm(0), i.GetStringParm(1))
+	// Inform admin
+	channel := c.GetChannel(i.GetChannelID())
+	channel.SendEmbedMessage("Changed Nickname")
+}
+
+func (h *NicknameHandler) Regester() api.StandaloneCommandSinginture {
+	return api.MakeStandaloneCommandSinginture("nickname", "Changes a server members nickname",
+		api.MakeUserParmSinginture("User", "User that will have nickname changed", true),
+		api.MakeStringParmSinginture("Nickname", "New Nickname", true),
 	)
-	// Return Handler
-	return types.Handler{
-		Name: "nickname", Callback: func(i *dgo.InteractionCreate, s *dgo.Session) {
-			HandleNickname(
-				i.Interaction.Data.Options[0].Value.(string),
-				i.Interaction.Data.Options[1].Value.(string),
-				i,
-				s,
-			)
-		},
-	}
 }

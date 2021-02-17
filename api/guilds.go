@@ -68,6 +68,11 @@ func (g *Guild) GetIntegrationIDs() []string {
 
 func (g *Guild) GetAuditLog() {}
 
+func (g *Guild) GetBoosting() int {
+	guild, _ := g.c.client.State.Guild(g.guildID)
+	return guild.PremiumSubscriptionCount
+}
+
 func (g *Guild) GetBans() []Ban {
 	dgoBans, _ := g.c.client.GuildBans(g.guildID)
 	bans := []Ban{}
@@ -140,4 +145,8 @@ func (g *Guild) AssignRole(userID, roleID string) {
 
 func (g *Guild) RevokeRole(userID, roleID string) {
 	g.c.client.GuildMemberRoleRemove(g.guildID, userID, roleID)
+}
+
+func (g *Guild) SetNickname(userID, newNickname string) {
+	g.c.client.GuildMemberNickname(g.guildID, userID, newNickname)
 }

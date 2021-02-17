@@ -1,93 +1,38 @@
 package commands
 
 import (
-	"github.com/AJGherardi/ManageBot/types"
-	"github.com/AJGherardi/ManageBot/utils"
-	dgo "github.com/bwmarrin/discordgo"
+	"github.com/AJGherardi/ManageBot/api"
 )
 
-// HandleWarn handles a warn command
-func HandleWarn(userID, violation string, i *dgo.InteractionCreate, s *dgo.Session) {
-	// Get user from parms
-	user, _ := s.User(userID)
-	utils.SendResponse(user.Mention()+" This is you final warning for "+violation, i, s)
+// WarnHandler handles a warn command
+type WarnHandler struct{}
+
+func (h *WarnHandler) Name() string {
+	return "warn"
 }
 
-// RegesterWarn adds the warn / command
-func RegesterWarn(client *dgo.Session, guildID string) types.Handler {
-	client.ApplicationCommandCreate(
-		"",
-		&dgo.ApplicationCommand{
-			Name:        "warn",
-			Description: "Warn for user rule violation",
-			Options: []*dgo.ApplicationCommandOption{
-				{
-					Type:        dgo.ApplicationCommandOptionUser,
-					Name:        "User",
-					Description: "User to warn",
-					Required:    true,
-				},
-				{
-					Type:        dgo.ApplicationCommandOptionString,
-					Name:        "Violation",
-					Description: "Rules violated",
-					Choices: []*dgo.ApplicationCommandOptionChoice{
-						{
-							Name:  "Gore",
-							Value: "Gore",
-						},
-						{
-							Name:  "Harassment",
-							Value: "Harassment",
-						},
-						{
-							Name:  "Disrespecting staff",
-							Value: "Disrespecting staff",
-						},
-						{
-							Name:  "Sexually explicit content",
-							Value: "Sexually explicit content",
-						},
-						{
-							Name:  "Advertizing",
-							Value: "Advertizing",
-						},
-						{
-							Name:  "Spam",
-							Value: "Spam",
-						},
-						{
-							Name:  "Obsessive pinging",
-							Value: "Obsessive Pinging",
-						},
-						{
-							Name:  "Hate Speech",
-							Value: "Hate Speech",
-						},
-						{
-							Name:  "Threatening People",
-							Value: "Threatening People",
-						},
-						{
-							Name:  "Sending Dangerous Links",
-							Value: "Sending Dangerous Links",
-						},
-					},
-					Required: true,
-				},
-			},
-		},
-		guildID,
+func (h *WarnHandler) Callback(i api.StandaloneCommandInvocation, c api.Connection) {
+	// Get user
+	user := c.GetUser(i.GetStringParm(0))
+	// Send warning
+	channel := c.GetChannel(i.GetChannelID())
+	channel.SendEmbedMessage(user.Mention() + " This is you final warning for " + i.GetStringParm(1))
+}
+
+func (h *WarnHandler) Regester() api.StandaloneCommandSinginture {
+	return api.MakeStandaloneCommandSinginture("warn", "Warn for user rule violation",
+		api.MakeUserParmSinginture("User", "User to warn", true),
+		api.MakeParmSingintureWithChoices("Violation", "Rule violated", true,
+			api.Choice{Name: "Gore", Value: "Gore"},
+			api.Choice{Name: "Harassment", Value: "Harassment"},
+			api.Choice{Name: "Disrespecting staff", Value: "Disrespecting staff"},
+			api.Choice{Name: "Sexually explicit content", Value: "Sexually explicit content"},
+			api.Choice{Name: "Advertizing", Value: "Advertizing"},
+			api.Choice{Name: "Spam", Value: "Spam"},
+			api.Choice{Name: "Obsessive Pinging", Value: "Obsessive Pinging"},
+			api.Choice{Name: "Hate Speech", Value: "Hate Speech"},
+			api.Choice{Name: "Threatening People", Value: "Threatening People"},
+			api.Choice{Name: "Sending Dangerous Links", Value: "Sending Dangerous Links"},
+		),
 	)
-	// Return Handler
-	return types.Handler{
-		Name: "warn", Callback: func(i *dgo.InteractionCreate, s *dgo.Session) {
-			HandleWarn(
-				i.Interaction.Data.Options[0].Value.(string),
-				i.Interaction.Data.Options[1].Value.(string),
-				i,
-				s,
-			)
-		},
-	}
 }

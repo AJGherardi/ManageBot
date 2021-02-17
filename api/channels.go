@@ -1,7 +1,10 @@
 package api
 
 // TODO: Deduplicate
-import embed "github.com/clinet/discordgo-embed"
+import (
+	"github.com/bwmarrin/discordgo"
+	embed "github.com/clinet/discordgo-embed"
+)
 
 type Channel struct {
 	channelID string
@@ -52,11 +55,19 @@ func (st *Channel) DeleteMessages(number int) {
 
 func (st *Channel) PinMessage(msgID string) {
 	st.c.client.ChannelMessagePin(st.channelID, msgID)
-
 }
 
 func (st *Channel) UnpinMessage(msgID string) {
 	st.c.client.ChannelMessageUnpin(st.channelID, msgID)
+}
+
+func (st *Channel) CreateInviteCode(maxUses int, temporary bool) string {
+	invite, _ := st.c.client.ChannelInviteCreate(st.channelID, discordgo.Invite{
+		MaxAge:    100,
+		MaxUses:   maxUses,
+		Temporary: temporary,
+	})
+	return invite.Code
 }
 
 func (st *Channel) Mention() string {
@@ -135,7 +146,6 @@ func (st *DMChannel) DeleteMessages(number int) {
 
 func (st *DMChannel) PinMessage(msgID string) {
 	st.c.client.ChannelMessagePin(st.channelID, msgID)
-
 }
 
 func (st *DMChannel) UnpinMessage(msgID string) {
