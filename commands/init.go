@@ -1,50 +1,32 @@
 package commands
 
 import (
-	"github.com/AJGherardi/ManageBot/types"
-	"github.com/AJGherardi/ManageBot/utils"
+	"github.com/AJGherardi/ManageBot/api"
 	dgo "github.com/bwmarrin/discordgo"
 )
 
-// HandleInit handles a init command
-func HandleInit(i *dgo.InteractionCreate, s *dgo.Session) {
-	// Make channels
-	s.GuildChannelCreateComplex(i.GuildID, dgo.GuildChannelCreateData{
-		Name: "logs",
-		Type: dgo.ChannelType(dgo.ChannelTypeGuildText),
-		NSFW: false,
-	})
-	s.GuildChannelCreateComplex(i.GuildID, dgo.GuildChannelCreateData{
-		Name: "reports",
-		Type: dgo.ChannelType(dgo.ChannelTypeGuildText),
-		NSFW: false,
-	})
-	s.GuildChannelCreateComplex(i.GuildID, dgo.GuildChannelCreateData{
-		Name: "tickets",
-		Type: dgo.ChannelType(dgo.ChannelTypeGuildText),
-		NSFW: false,
-	})
-	// Make roles
-	moderator, _ := s.GuildRoleCreate(i.GuildID)
-	s.GuildRoleEdit(i.GuildID, moderator.ID, "moderator", 50, false, 1543499751, true)
-	member, _ := s.GuildRoleCreate(i.GuildID)
-	s.GuildRoleEdit(i.GuildID, member.ID, "member", 50, false, 3526209, true)
-	// Inform admin
-	utils.SendResponse("Server initialized", i, s)
+type InitHandler struct{}
+
+func (h *InitHandler) Name() string {
+	return "init"
 }
 
-// RegesterInit adds the init / command
-func RegesterInit(client *dgo.Session, guildID string) types.Handler {
-	client.ApplicationCommandCreate(
-		"",
-		&dgo.ApplicationCommand{
-			Name:        "init",
-			Description: "Adds internal channels and roles to server",
-		},
-		guildID,
-	)
-	// Return Handler
-	return types.Handler{
-		Name: "init", Callback: HandleInit,
-	}
+func (h *InitHandler) Callback(i api.StandaloneCommandInvocation, c api.Connection) {
+	guild := c.GetGuild(i.GetGuildID())
+	// Make channels
+	guild.CreateChannel("logs", "", int(dgo.ChannelTypeGuildText), false)
+	guild.CreateChannel("reports", "", int(dgo.ChannelTypeGuildText), false)
+	guild.CreateCategory("tickets")
+	guild.CreateCategory("archives")
+	// Make roles
+	guild.CreateRole("moderator", 50, 1543499751, true)
+	guild.CreateRole("member", 50, 3526209, true)
+	guild.CreateRole("muted", 50, 1024, true)
+	// Inform admin
+	channel := c.GetChannel(i.GetChannelID())
+	channel.SendEmbedMessage("Server initialized")
+}
+
+func (h *InitHandler) Regester(c api.Connection) api.StandaloneCommandSinginture {
+	return api.MakeStandaloneCommandSinginture("init", "Adds internal channels and roles to server")
 }

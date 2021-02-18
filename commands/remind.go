@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/AJGherardi/ManageBot/types"
-	"github.com/AJGherardi/ManageBot/utils"
-	dgo "github.com/bwmarrin/discordgo"
+	"github.com/AJGherardi/ManageBot/api"
 )
 
 type remind struct {
@@ -16,126 +14,95 @@ type remind struct {
 
 var reminders []remind
 
-var remindSubcommands []types.Subcommand = []types.Subcommand{
-	{
-		Name: "set",
-		Callback: func(parms types.SubcommandParms) {
-			handleRemindSet(
-				parms.Option.Options[0].Value.(string),
-				parms.Option.Options[1].Value.(float64),
-				parms.Interaction,
-				parms.Session,
-			)
-		},
-	},
-	{
-		Name: "view",
-		Callback: func(parms types.SubcommandParms) {
-			handleRemindView(
-				parms.Interaction,
-				parms.Session,
-			)
-		},
-	},
-	{
-		Name: "delete",
-		Callback: func(parms types.SubcommandParms) {
-			handleRemindDelete(
-				parms.Option.Options[0].Value.(float64),
-				parms.Interaction,
-				parms.Session,
-			)
-		},
-	},
+type RemindHandler struct{}
+
+func (h *RemindHandler) Name() string {
+	return "remind"
 }
 
-func handleRemindSet(title string, duration float64, i *dgo.InteractionCreate, s *dgo.Session) {
-	utils.SendResponse("Reminder set for "+title+" in "+fmt.Sprint(duration)+" min", i, s)
+func (h *RemindHandler) Subcommands() []api.Subcommand {
+	return []api.Subcommand{
+		&setRemindHandler{},
+		&viewRemindHandler{},
+		&deleteRemindHandler{},
+	}
+}
+
+func (h *RemindHandler) Regester(c api.Connection) api.ParentCommandSinginture {
+	return api.MakeParentCommandSinginture("remind", "Manage reminders")
+}
+
+type setRemindHandler struct{}
+
+func (h *setRemindHandler) Name() string {
+	return "set"
+}
+
+func (h *setRemindHandler) Callback(i api.SubcommandInvocation, c api.Connection) {
+	channel := c.GetChannel(i.GetChannelID())
+	channel.SendEmbedMessage("Reminder set for " + i.GetStringParm(0) + " in " + fmt.Sprint(i.GetIntParm(1)) + " min")
 	// Add a timer for the remind
 	timer := time.AfterFunc(
-		(time.Duration(duration) * time.Minute), func() {
-			utils.SendResponse("Reminder for "+title, i, s)
+		(time.Duration(i.GetIntParm(1)) * time.Minute), func() {
+			channel := c.GetChannel(i.GetChannelID())
+			channel.SendEmbedMessage("Reminder for " + i.GetStringParm(0))
 		},
 	)
 	// Append remind to list
 	reminders = append(reminders, remind{
-		Title: title,
+		Title: i.GetStringParm(0),
 		Timer: timer,
 	})
 }
 
-func handleRemindView(i *dgo.InteractionCreate, s *dgo.Session) {
-	utils.SendResponse("There are "+fmt.Sprint(len(reminders)), i, s)
+func (h *setRemindHandler) Regester(c api.Connection) api.SubcommandSinginture {
+	return api.MakeSubcommandSinginture(
+		"set", "Set a reminder",
+		api.MakeStringParmSinginture("Title", "Title of reminder", true),
+		api.MakeIntParmSinginture("Time", "How many min until reminder", true),
+	)
+}
+
+type viewRemindHandler struct{}
+
+func (h *viewRemindHandler) Name() string {
+	return "view"
+}
+
+func (h *viewRemindHandler) Callback(i api.SubcommandInvocation, c api.Connection) {
+	channel := c.GetChannel(i.GetChannelID())
+	channel.SendEmbedMessage("There is " + fmt.Sprint(len(reminders)))
 	for index, reminder := range reminders {
-		utils.SendResponse("There is a Reminder for "+reminder.Title+" at index "+fmt.Sprint(index), i, s)
+		channel.SendEmbedMessage("There is a Reminder for " + reminder.Title + " at index " + fmt.Sprint(index))
 	}
 }
 
-func handleRemindDelete(index float64, i *dgo.InteractionCreate, s *dgo.Session) {
-	utils.SendResponse("Deleted reminder", i, s)
-	// Remove remind from slice
-	reminders = removeRemind(reminders, int(index))
+func (h *viewRemindHandler) Regester(c api.Connection) api.SubcommandSinginture {
+	return api.MakeSubcommandSinginture("view", "View reminders")
+}
+
+type deleteRemindHandler struct{}
+
+func (h *deleteRemindHandler) Name() string {
+	return "delete"
+}
+
+func (h *deleteRemindHandler) Callback(i api.SubcommandInvocation, c api.Connection) {
+	channel := c.GetChannel(i.GetChannelID())
+	channel.SendEmbedMessage("Deleted reminder")
 	// Stop timmer for remind
-	reminders[int(index)].Timer.Stop()
+	reminders[i.GetIntParm(0)].Timer.Stop()
+	// Remove remind from slice
+	reminders = removeRemind(reminders, i.GetIntParm(0))
+}
+
+func (h *deleteRemindHandler) Regester(c api.Connection) api.SubcommandSinginture {
+	return api.MakeSubcommandSinginture(
+		"delete", "Deletes the reminder at the given index",
+		api.MakeIntParmSinginture("Index", "Index of reminder", true),
+	)
 }
 
 func removeRemind(slice []remind, s int) []remind {
 	return append(slice[:s], slice[s+1:]...)
-}
-
-// RegesterRemind adds the remind / command
-func RegesterRemind(client *dgo.Session, guildID string) types.Handler {
-	client.ApplicationCommandCreate(
-		"",
-		&dgo.ApplicationCommand{
-			Name:        "remind",
-			Description: "Manage reminders",
-			Options: []*dgo.ApplicationCommandOption{
-				{
-					Type:        dgo.ApplicationCommandOptionSubCommand,
-					Name:        "set",
-					Description: "Set a reminder",
-					Options: []*dgo.ApplicationCommandOption{
-						{
-							Type:        dgo.ApplicationCommandOptionString,
-							Name:        "Title",
-							Description: "Title of reminder",
-							Required:    true,
-						},
-						{
-							Type:        dgo.ApplicationCommandOptionInteger,
-							Name:        "Time",
-							Description: "How many min until reminder",
-							Required:    true,
-						},
-					},
-				},
-				{
-					Type:        dgo.ApplicationCommandOptionSubCommand,
-					Name:        "view",
-					Description: "View reminders",
-				},
-				{
-					Type:        dgo.ApplicationCommandOptionSubCommand,
-					Name:        "delete",
-					Description: "Deletes the reminder at the given index",
-					Options: []*dgo.ApplicationCommandOption{
-						{
-							Type:        dgo.ApplicationCommandOptionInteger,
-							Name:        "index",
-							Description: "Index of reminder",
-							Required:    true,
-						},
-					},
-				},
-			},
-		},
-		guildID,
-	)
-	// Return Handler
-	return types.Handler{
-		Name: "remind", Callback: func(i *dgo.InteractionCreate, s *dgo.Session) {
-			utils.MatchSubcommand(i, s, remindSubcommands)
-		},
-	}
 }

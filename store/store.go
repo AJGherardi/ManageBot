@@ -4,7 +4,6 @@ import (
 	"context"
 	"log"
 
-	"github.com/AJGherardi/ManageBot/types"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -13,13 +12,37 @@ import (
 
 // TODO: Implment locks
 
+// ServerData holds all persistant information that is needed to manage a discord guild
+type ServerData struct {
+	GuildID string `bson:"guildID,omitempty"`
+	Name    string `bson:"name,omitempty"`
+	// CommandHistory
+	// Tickets
+	// Warnings
+}
+
+// GetGuildID returns the servers id
+func (s *ServerData) GetGuildID() string {
+	return s.GuildID
+}
+
+// ChangeName changes the servers name
+func (s *ServerData) ChangeName(name string) {
+	s.Name = name
+}
+
+// GetName retuens the servers name
+func (s *ServerData) GetName() string {
+	return s.Name
+}
+
 // DB defines a interface for manageing application data
 type DB interface {
-	GetAllServers() []types.ServerData
-	OpenServer(guildID string) types.ServerData
-	CreateServer(types.ServerData)
+	GetAllServers() []ServerData
+	OpenServer(guildID string) ServerData
+	CreateServer(ServerData)
 	DeleteServer(guildID string)
-	CloseServerWithReplacment(guildID string, replacement types.ServerData)
+	CloseServerWithReplacment(guildID string, replacement ServerData)
 }
 
 // MongoDB holds and abstracts access to the mongo database and its collections
@@ -28,7 +51,7 @@ type MongoDB struct {
 }
 
 // GetAllServers returns a slice of all servers
-func (d *MongoDB) GetAllServers() []types.ServerData {
+func (d *MongoDB) GetAllServers() []ServerData {
 	// Get all documents
 	cursor, err := d.servers.Find(context.Background(), bson.M{})
 	if err != nil {
@@ -36,10 +59,10 @@ func (d *MongoDB) GetAllServers() []types.ServerData {
 	}
 	defer cursor.Close(context.Background())
 	// Make servers slice
-	servers := []types.ServerData{}
+	servers := []ServerData{}
 	for cursor.Next(context.Background()) {
 		// Decode into server struct
-		var server types.ServerData
+		var server ServerData
 		if err = cursor.Decode(&server); err != nil {
 			log.Fatal(err)
 		}
@@ -50,26 +73,26 @@ func (d *MongoDB) GetAllServers() []types.ServerData {
 }
 
 // OpenServer returns the server with the given guild id
-func (d *MongoDB) OpenServer(guildID string) types.ServerData {
+func (d *MongoDB) OpenServer(guildID string) ServerData {
 	// Get document and decode
-	var server types.ServerData
-	d.servers.FindOne(context.Background(), types.ServerData{GuildID: guildID}).Decode(&server)
+	var server ServerData
+	d.servers.FindOne(context.Background(), ServerData{GuildID: guildID}).Decode(&server)
 	return server
 }
 
 // CreateServer inserts a server
-func (d *MongoDB) CreateServer(server types.ServerData) {
+func (d *MongoDB) CreateServer(server ServerData) {
 	d.servers.InsertOne(context.Background(), server)
 }
 
 // DeleteServer removes the server at the given guild id
 func (d *MongoDB) DeleteServer(guildID string) {
-	d.servers.DeleteOne(context.Background(), types.ServerData{GuildID: guildID})
+	d.servers.DeleteOne(context.Background(), ServerData{GuildID: guildID})
 }
 
 // CloseServerWithReplacment replaces the server at the given guild id
-func (d *MongoDB) CloseServerWithReplacment(guildID string, replacement types.ServerData) {
-	d.servers.ReplaceOne(context.Background(), types.ServerData{GuildID: guildID}, replacement)
+func (d *MongoDB) CloseServerWithReplacment(guildID string, replacement ServerData) {
+	d.servers.ReplaceOne(context.Background(), ServerData{GuildID: guildID}, replacement)
 }
 
 // OpenDB returns the DB struct which is used to manage application data

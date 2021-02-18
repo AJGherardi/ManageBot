@@ -1,10 +1,84 @@
 package commands
 
 import (
-	"github.com/AJGherardi/ManageBot/types"
-	"github.com/AJGherardi/ManageBot/utils"
-	dgo "github.com/bwmarrin/discordgo"
+	"github.com/AJGherardi/ManageBot/api"
 )
+
+type SayHandler struct{}
+
+func (h *SayHandler) Name() string {
+	return "say"
+}
+
+func (h *SayHandler) Subcommands() []api.Subcommand {
+	return []api.Subcommand{
+		&messageSayHandler{},
+		&dmSayHandler{},
+		&reactionRoleSayHandler{},
+	}
+}
+
+func (h *SayHandler) Regester(c api.Connection) api.ParentCommandSinginture {
+	return api.MakeParentCommandSinginture("say", "More powerful messages")
+}
+
+type messageSayHandler struct{}
+
+func (h *messageSayHandler) Name() string {
+	return "message"
+}
+
+func (h *messageSayHandler) Callback(i api.SubcommandInvocation, c api.Connection) {
+	channel := c.GetChannel(i.GetChannelID())
+	// Repeat sending messages
+	for r := 0; r < i.GetIntParm(1); r++ {
+		// Check if embed
+		if i.GetBoolParm(2) {
+			channel.SendEmbedMessage(i.GetStringParm(0))
+		} else {
+			channel.SendMessage(i.GetStringParm(0))
+		}
+	}
+}
+
+func (h *messageSayHandler) Regester(c api.Connection) api.SubcommandSinginture {
+	return api.MakeSubcommandSinginture(
+		"message", "Repeats a message",
+		api.MakeStringParmSinginture("Message", "Message to repeat", true),
+		api.MakeIntParmSinginture("Repeat", "Number of times to repeat", true),
+		api.MakeBoolParmSinginture("Embed", "Sends message in a embed", true),
+	)
+}
+
+type dmSayHandler struct{}
+
+func (h *dmSayHandler) Name() string {
+	return "dm"
+}
+
+func (h *dmSayHandler) Callback(i api.SubcommandInvocation, c api.Connection) {
+	user := c.GetUser(i.GetStringParm(0))
+	dmChannel := c.GetDMChannel(user.GetDMChannelID())
+	// Repeat sending messages
+	for r := 0; r < i.GetIntParm(2); r++ {
+		// Check if embed
+		if i.GetBoolParm(3) {
+			dmChannel.SendEmbedMessage(i.GetStringParm(1))
+		} else {
+			dmChannel.SendMessage(i.GetStringParm(1))
+		}
+	}
+}
+
+func (h *dmSayHandler) Regester(c api.Connection) api.SubcommandSinginture {
+	return api.MakeSubcommandSinginture(
+		"dm", "Sends a dm",
+		api.MakeUserParmSinginture("User", "User to dm", true),
+		api.MakeStringParmSinginture("Message", "Message to repeat", true),
+		api.MakeIntParmSinginture("Repeat", "Number of times to repeat", true),
+		api.MakeBoolParmSinginture("Embed", "Sends message in a embed", true),
+	)
+}
 
 type reactionRole struct {
 	EmojiID   string
@@ -15,192 +89,44 @@ type reactionRole struct {
 
 var reactionRoles []reactionRole
 
-var saySubcommands []types.Subcommand = []types.Subcommand{
-	{
-		Name: "message",
-		Callback: func(parms types.SubcommandParms) {
-			handleMessage(
-				parms.Option.Options[0].Value.(string),
-				parms.Option.Options[1].Value.(float64),
-				parms.Option.Options[2].Value.(bool),
-				parms.Interaction,
-				parms.Session,
-			)
-		},
-	},
-	{
-		Name: "dm",
-		Callback: func(parms types.SubcommandParms) {
-			handleDM(
-				parms.Option.Options[0].Value.(string),
-				parms.Option.Options[1].Value.(string),
-				parms.Option.Options[2].Value.(float64),
-				parms.Option.Options[3].Value.(bool),
-				parms.Interaction,
-				parms.Session,
-			)
-		},
-	},
-	{
-		Name: "reaction-role",
-		Callback: func(parms types.SubcommandParms) {
-			handleReactionRole(
-				parms.Option.Options[0].Value.(string),
-				parms.Option.Options[1].Value.(string),
-				parms.Option.Options[2].Value.(string),
-				parms.Interaction,
-				parms.Session,
-			)
-		},
-	},
+type reactionRoleSayHandler struct{}
+
+func (h *reactionRoleSayHandler) Name() string {
+	return "reaction-role"
 }
 
-func reactionHandler(s *dgo.Session, reaction *dgo.MessageReactionAdd) {
-	for _, rr := range reactionRoles {
-		if rr.EmojiID == reaction.Emoji.Name {
-			if reaction.MessageID == rr.MessageID {
-				s.GuildMemberRoleAdd(rr.GuildID, reaction.UserID, rr.RoleID)
-			}
-		}
-	}
-}
-
-// handleDM handles a say dm command
-func handleDM(userID, message string, number float64, embed bool, i *dgo.InteractionCreate, s *dgo.Session) {
-	channel, _ := s.UserChannelCreate(userID)
-	for r := 0; r < int(number); r++ {
-		if embed {
-			utils.SendDM(message, channel.ID, s)
-		} else {
-			s.ChannelMessageSend(channel.ID, message)
-		}
-	}
-}
-
-// handleMessage handles a say message command
-func handleMessage(message string, number float64, embed bool, i *dgo.InteractionCreate, s *dgo.Session) {
-	for r := 0; r < int(number); r++ {
-		if embed {
-			utils.SendResponse(message, i, s)
-		} else {
-			s.ChannelMessageSend(i.ChannelID, message)
-		}
-	}
-}
-
-// handleReactionRole handles a say reaction-role command
-func handleReactionRole(message, emoji, roleID string, i *dgo.InteractionCreate, s *dgo.Session) {
-	m := utils.SendResponse(message, i, s)
+func (h *reactionRoleSayHandler) Callback(i api.SubcommandInvocation, c api.Connection) {
+	// Send message and get msgID
+	channel := c.GetChannel(i.GetChannelID())
+	msgID := channel.SendEmbedMessage(i.GetStringParm(0))
 	// Add initial reaction
-	s.MessageReactionAdd(i.ChannelID, m.ID, emoji)
+	channel.CreateReaction(msgID, i.GetStringParm(1))
 	// Add reaction role
 	reactionRoles = append(reactionRoles, reactionRole{
-		EmojiID:   emoji,
-		MessageID: m.ID,
-		RoleID:    roleID,
-		GuildID:   i.GuildID,
+		EmojiID:   i.GetStringParm(1),
+		MessageID: msgID,
+		RoleID:    i.GetStringParm(2),
+		GuildID:   i.GetGuildID(),
 	})
 }
 
-// RegesterSay adds the say / command and its subcommands
-func RegesterSay(client *dgo.Session, guildID string) types.Handler {
-	client.ApplicationCommandCreate(
-		"",
-		&dgo.ApplicationCommand{
-			Name:        "say",
-			Description: "More powerful messages",
-			Options: []*dgo.ApplicationCommandOption{
-				{
-					Type:        dgo.ApplicationCommandOptionSubCommand,
-					Name:        "message",
-					Description: "Repeats a message",
-					Options: []*dgo.ApplicationCommandOption{
-						{
-							Type:        dgo.ApplicationCommandOptionString,
-							Name:        "Message",
-							Description: "Message to repeat",
-							Required:    true,
-						},
-						{
-							Type:        dgo.ApplicationCommandOptionInteger,
-							Name:        "Repeat",
-							Description: "Number of times to repeat",
-							Required:    true,
-						},
-						{
-							Type:        dgo.ApplicationCommandOptionBoolean,
-							Name:        "Embed",
-							Description: "Sends message in a embed",
-							Required:    true,
-						},
-					},
-				},
-				{
-					Type:        dgo.ApplicationCommandOptionSubCommand,
-					Name:        "dm",
-					Description: "Sends a dm",
-					Options: []*dgo.ApplicationCommandOption{
-						{
-							Type:        dgo.ApplicationCommandOptionUser,
-							Name:        "User",
-							Description: "User to dm",
-							Required:    true,
-						},
-						{
-							Type:        dgo.ApplicationCommandOptionString,
-							Name:        "Message",
-							Description: "Message to send",
-							Required:    true,
-						},
-						{
-							Type:        dgo.ApplicationCommandOptionInteger,
-							Name:        "Repeat",
-							Description: "Number of times to send",
-							Required:    true,
-						},
-						{
-							Type:        dgo.ApplicationCommandOptionBoolean,
-							Name:        "Embed",
-							Description: "Sends message in a embed",
-							Required:    true,
-						},
-					},
-				},
-				{
-					Type:        dgo.ApplicationCommandOptionSubCommand,
-					Name:        "reaction-role",
-					Description: "Grants role to whoever reacts using given emoji",
-					Options: []*dgo.ApplicationCommandOption{
-						{
-							Type:        dgo.ApplicationCommandOptionString,
-							Name:        "message",
-							Description: "Message content",
-							Required:    true,
-						},
-						{
-							Type:        dgo.ApplicationCommandOptionString,
-							Name:        "Emoji",
-							Description: "Emoji for reaction",
-							Required:    true,
-						},
-						{
-							Type:        dgo.ApplicationCommandOptionRole,
-							Name:        "Role",
-							Description: "Role assigned",
-							Required:    true,
-						},
-					},
-				},
-			},
-		},
-		guildID,
+func (h *reactionRoleSayHandler) Regester(c api.Connection) api.SubcommandSinginture {
+	// Start reaction handler
+	c.StartReactionHandler(func(c api.Connection, msgID, userID, emojiName string) {
+		// Match Reaction Role
+		for _, rr := range reactionRoles {
+			if rr.EmojiID == emojiName {
+				if msgID == rr.MessageID {
+					guild := c.GetGuild(rr.GuildID)
+					guild.AssignRole(userID, rr.RoleID)
+				}
+			}
+		}
+	})
+	return api.MakeSubcommandSinginture(
+		"reaction-role", "Grants role to whoever reacts using given emoji",
+		api.MakeStringParmSinginture("Message", "Message content", true),
+		api.MakeStringParmSinginture("Emoji", "Emoji for reaction", true),
+		api.MakeRoleParmSinginture("Role", "Role assigned", true),
 	)
-	// Add reaction handler
-	client.AddHandler(reactionHandler)
-	// Return Handler
-	return types.Handler{
-		Name: "say", Callback: func(i *dgo.InteractionCreate, s *dgo.Session) {
-			utils.MatchSubcommand(i, s, saySubcommands)
-		},
-	}
 }
