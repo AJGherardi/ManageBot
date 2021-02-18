@@ -17,6 +17,6 @@ func (h *InviteHandler) Callback(i api.StandaloneCommandInvocation, c api.Connec
 	channel.SendEmbedMessage("Invite link https://discord.gg/" + code)
 }
 
-func (h *InviteHandler) Regester() api.StandaloneCommandSinginture {
+func (h *InviteHandler) Regester(c api.Connection) api.StandaloneCommandSinginture {
 	return api.MakeStandaloneCommandSinginture("invite", "Generate a invite link")
 }

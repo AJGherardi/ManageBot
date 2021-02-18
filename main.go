@@ -35,7 +35,11 @@ func getCommands() ([]api.StandaloneCommand, []api.ParentCommand) {
 			&commands.PurgeHandler{},
 			&commands.WarnHandler{},
 			&commands.StatsHandler{},
+			&commands.VoteHandler{},
 		}, []api.ParentCommand{
 			&commands.ChannelHandler{},
+			&commands.SayHandler{},
+			&commands.RemindHandler{},
+			&commands.RoleHandler{},
 		}
 }

@@ -13,23 +13,23 @@ func (h *ChannelHandler) Name() string {
 
 func (h *ChannelHandler) Subcommands() []api.Subcommand {
 	return []api.Subcommand{
-		&createHandler{},
-		&createGroupHandler{},
-		&deleteHandler{},
+		&createChannelHandler{},
+		&createGroupChannelHandler{},
+		&deleteChannelHandler{},
 	}
 }
 
-func (h *ChannelHandler) Regester() api.ParentCommandSinginture {
+func (h *ChannelHandler) Regester(c api.Connection) api.ParentCommandSinginture {
 	return api.MakeParentCommandSinginture("channel", "Manage channels")
 }
 
-type createHandler struct{}
+type createChannelHandler struct{}
 
-func (h *createHandler) Name() string {
+func (h *createChannelHandler) Name() string {
 	return "create"
 }
 
-func (h *createHandler) Callback(i api.SubcommandInvocation, c api.Connection) {
+func (h *createChannelHandler) Callback(i api.SubcommandInvocation, c api.Connection) {
 	guild := c.GetGuild(i.GetGuildID())
 	guild.CreateChannel(i.GetStringParm(0), i.GetStringParm(1), i.GetIntParm(2), i.GetBoolParm(3))
 	// Inform admin
@@ -37,7 +37,7 @@ func (h *createHandler) Callback(i api.SubcommandInvocation, c api.Connection) {
 	channel.SendEmbedMessage("Added channel " + channel.Mention())
 }
 
-func (h *createHandler) Regester() api.SubcommandSinginture {
+func (h *createChannelHandler) Regester(c api.Connection) api.SubcommandSinginture {
 	return api.MakeSubcommandSinginture(
 		"create", "Adds a channel",
 		api.MakeStringParmSinginture("Name", "Name to give new channel", true),
@@ -51,13 +51,13 @@ func (h *createHandler) Regester() api.SubcommandSinginture {
 	)
 }
 
-type createGroupHandler struct{}
+type createGroupChannelHandler struct{}
 
-func (h *createGroupHandler) Name() string {
+func (h *createGroupChannelHandler) Name() string {
 	return "create-group"
 }
 
-func (h *createGroupHandler) Callback(i api.SubcommandInvocation, c api.Connection) {
+func (h *createGroupChannelHandler) Callback(i api.SubcommandInvocation, c api.Connection) {
 	guild := c.GetGuild(i.GetGuildID())
 	guild.CreateCategory(i.GetStringParm(0))
 	// Inform admin
@@ -65,20 +65,20 @@ func (h *createGroupHandler) Callback(i api.SubcommandInvocation, c api.Connecti
 	category.SendEmbedMessage("Added channel group " + category.Mention())
 }
 
-func (h *createGroupHandler) Regester() api.SubcommandSinginture {
+func (h *createGroupChannelHandler) Regester(c api.Connection) api.SubcommandSinginture {
 	return api.MakeSubcommandSinginture(
 		"create-group", "Adds a channel group",
 		api.MakeStringParmSinginture("Name", "Name to give new channel group", true),
 	)
 }
 
-type deleteHandler struct{}
+type deleteChannelHandler struct{}
 
-func (h *deleteHandler) Name() string {
+func (h *deleteChannelHandler) Name() string {
 	return "delete"
 }
 
-func (h *deleteHandler) Callback(i api.SubcommandInvocation, c api.Connection) {
+func (h *deleteChannelHandler) Callback(i api.SubcommandInvocation, c api.Connection) {
 	guild := c.GetGuild(i.GetGuildID())
 	guild.DeleteChannel(i.GetStringParm(0))
 	// Inform admin
@@ -86,7 +86,7 @@ func (h *deleteHandler) Callback(i api.SubcommandInvocation, c api.Connection) {
 	channel.SendEmbedMessage("Deleted channel " + channel.GetName())
 }
 
-func (h *deleteHandler) Regester() api.SubcommandSinginture {
+func (h *deleteChannelHandler) Regester(c api.Connection) api.SubcommandSinginture {
 	return api.MakeSubcommandSinginture(
 		"delete", "Remove a channel",
 		api.MakeChannelParmSinginture("Channel", "Channel to remove", true),

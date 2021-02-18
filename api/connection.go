@@ -22,6 +22,12 @@ func ConnectToDiscord(botToken, guildID string) Connection {
 	// Opens the connection
 	client.Open()
 	// Remove all commands
-	deleteAllCommands(client, guildID)
+	// deleteAllCommands(client, guildID)
 	return Connection{client: client}
+}
+
+func (c *Connection) StartReactionHandler(handler func(c Connection, msgID, userID, emojiName string)) {
+	c.client.AddHandler(func(s *dgo.Session, reaction *dgo.MessageReactionAdd) {
+		handler(*c, reaction.MessageID, reaction.UserID, reaction.Emoji.Name)
+	})
 }

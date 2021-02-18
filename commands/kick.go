@@ -19,7 +19,7 @@ func (h *KickHandler) Callback(i api.StandaloneCommandInvocation, c api.Connecti
 	channel.SendEmbedMessage("User kicked")
 }
 
-func (h *KickHandler) Regester() api.StandaloneCommandSinginture {
+func (h *KickHandler) Regester(c api.Connection) api.StandaloneCommandSinginture {
 	return api.MakeStandaloneCommandSinginture("kick", "Kicks a user",
 		api.MakeUserParmSinginture("User", "User to kick", true),
 	)

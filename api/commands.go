@@ -10,7 +10,7 @@ type StandaloneCommand interface {
 	Callback(i StandaloneCommandInvocation, c Connection)
 	// Builds and returns a descscription of a application command and its parameters
 	// which is regestred with the discord api
-	Regester() StandaloneCommandSinginture
+	Regester(c Connection) StandaloneCommandSinginture
 }
 
 // ParentCommand defines the behavior of a parent command which contains subcommands
@@ -21,7 +21,7 @@ type ParentCommand interface {
 	Subcommands() []Subcommand
 	// Builds and returns a descscription of a parent command
 	// which is regestered at the same time as the parrent command
-	Regester() ParentCommandSinginture
+	Regester(c Connection) ParentCommandSinginture
 }
 
 // Subcommand defines the behavior of a parent commands subcommand
@@ -32,7 +32,7 @@ type Subcommand interface {
 	Callback(i SubcommandInvocation, c Connection)
 	// Builds and returns a descscription of a subcommand and its parameters
 	// which is regestered at the same time as the parrent command
-	Regester() SubcommandSinginture
+	Regester(c Connection) SubcommandSinginture
 }
 
 type invocation struct {

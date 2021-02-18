@@ -19,6 +19,11 @@ func (c *Connection) GetUser(userID string) User {
 	}
 }
 
+func (u *User) GetDMChannelID() string {
+	channel, _ := u.c.client.UserChannelCreate(u.userID)
+	return channel.ID
+}
+
 func (u *User) IsOnline(guildID string) bool {
 	userPresence, _ := u.c.client.State.Presence(guildID, u.userID)
 	if userPresence != nil {

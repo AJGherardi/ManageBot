@@ -27,6 +27,6 @@ func (h *InitHandler) Callback(i api.StandaloneCommandInvocation, c api.Connecti
 	channel.SendEmbedMessage("Server initialized")
 }
 
-func (h *InitHandler) Regester() api.StandaloneCommandSinginture {
+func (h *InitHandler) Regester(c api.Connection) api.StandaloneCommandSinginture {
 	return api.MakeStandaloneCommandSinginture("init", "Adds internal channels and roles to server")
 }

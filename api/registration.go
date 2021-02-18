@@ -74,7 +74,7 @@ func routeStandaloneCommand(standaloneCommands []StandaloneCommand, i *dgo.Inter
 func regesterStandaloneCommands(c *Connection, standaloneCommands []StandaloneCommand, guildID string) {
 	for _, standaloneCommand := range standaloneCommands {
 		// Get command signature
-		standaloneCommandSinginture := standaloneCommand.Regester()
+		standaloneCommandSinginture := standaloneCommand.Regester(*c)
 		// Regester the command
 		c.client.ApplicationCommandCreate(
 			"",
@@ -91,11 +91,11 @@ func regesterStandaloneCommands(c *Connection, standaloneCommands []StandaloneCo
 func regesterParentCommands(c *Connection, parentCommands []ParentCommand, guildID string) {
 	for _, parentCommand := range parentCommands {
 		// Get parent signature
-		parentCommandSinginture := parentCommand.Regester()
+		parentCommandSinginture := parentCommand.Regester(*c)
 		// Get subcommand singintures
 		subcommandSingintures := []SubcommandSinginture{}
 		for _, subcommand := range parentCommand.Subcommands() {
-			subcommandSinginture := subcommand.Regester()
+			subcommandSinginture := subcommand.Regester(*c)
 			subcommandSingintures = append(subcommandSingintures, subcommandSinginture)
 		}
 		// Regester the command
@@ -132,16 +132,16 @@ func convertToSubcommandOptions(subcommands []SubcommandSinginture) []*dgo.Appli
 	return subcommandOptions
 }
 
-func deleteAllCommands(client *dgo.Session, guildID string) {
-	apps, _ := client.Applications()
-	for _, app := range apps {
-		cmds, _ := client.ApplicationCommands(app.ID, guildID)
-		for _, cmd := range cmds {
-			client.ApplicationCommandDelete(cmd.ApplicationID, cmd.ID, guildID)
-		}
-	}
-	cmds, _ := client.ApplicationCommands("", guildID)
-	for _, cmd := range cmds {
-		client.ApplicationCommandDelete(cmd.ApplicationID, cmd.ID, guildID)
-	}
-}
+// func deleteAllCommands(client *dgo.Session, guildID string) {
+// 	apps, _ := client.Applications()
+// 	for _, app := range apps {
+// 		cmds, _ := client.ApplicationCommands(app.ID, guildID)
+// 		for _, cmd := range cmds {
+// 			client.ApplicationCommandDelete(cmd.ApplicationID, cmd.ID, guildID)
+// 		}
+// 	}
+// 	cmds, _ := client.ApplicationCommands("", guildID)
+// 	for _, cmd := range cmds {
+// 		client.ApplicationCommandDelete(cmd.ApplicationID, cmd.ID, guildID)
+// 	}
+// }

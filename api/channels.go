@@ -38,6 +38,11 @@ func (st *Channel) SendEmbedMessage(text string) string {
 	return msg.ID
 }
 
+func (st *Channel) SendEmbedMessageWithTitle(title, caption string) string {
+	msg, _ := st.c.client.ChannelMessageSendEmbed(st.channelID, embed.NewGenericEmbed(title, caption))
+	return msg.ID
+}
+
 func (st *Channel) DeleteMessage(msgID string) {
 	st.c.client.ChannelMessageDelete(st.channelID, msgID)
 }
@@ -59,6 +64,19 @@ func (st *Channel) PinMessage(msgID string) {
 
 func (st *Channel) UnpinMessage(msgID string) {
 	st.c.client.ChannelMessageUnpin(st.channelID, msgID)
+}
+
+func (st *Channel) CreateReaction(msgID, emoji string) {
+	st.c.client.MessageReactionAdd(st.channelID, msgID, emoji)
+}
+
+func (st *Channel) GetReactions(msgID, emoji string) []string {
+	users, _ := st.c.client.MessageReactions(st.channelID, msgID, emoji, 100, "", "")
+	userIDs := []string{}
+	for _, user := range users {
+		userIDs = append(userIDs, user.ID)
+	}
+	return userIDs
 }
 
 func (st *Channel) CreateInviteCode(maxUses int, temporary bool) string {
@@ -112,9 +130,9 @@ type DMChannel struct {
 	c         *Connection
 }
 
-func (c *Connection) GetDMChannel(channelID string) DMChannel {
+func (c *Connection) GetDMChannel(dmChannelID string) DMChannel {
 	return DMChannel{
-		channelID: channelID,
+		channelID: dmChannelID,
 		c:         c,
 	}
 }
@@ -122,6 +140,11 @@ func (c *Connection) GetDMChannel(channelID string) DMChannel {
 func (st *DMChannel) GetName() string {
 	channel, _ := st.c.client.Channel(st.channelID)
 	return channel.Name
+}
+
+func (st *DMChannel) SendEmbedMessage(text string) string {
+	msg, _ := st.c.client.ChannelMessageSendEmbed(st.channelID, embed.NewGenericEmbed("", text))
+	return msg.ID
 }
 
 func (st *DMChannel) SendMessage(text string) string {

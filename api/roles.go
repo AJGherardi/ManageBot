@@ -3,9 +3,10 @@ package api
 import dgo "github.com/bwmarrin/discordgo"
 
 type Role struct {
-	guildID string
-	roleID  string
-	c       *Connection
+	guildID        string
+	roleID         string
+	newPermissions int
+	c              *Connection
 }
 
 type Permission int
@@ -44,10 +45,13 @@ const (
 )
 
 func (c *Connection) GetRole(guildID, roleID string) Role {
+	// Prelode permissions int
+	role, _ := c.client.State.Role(guildID, roleID)
 	return Role{
-		guildID: guildID,
-		roleID:  roleID,
-		c:       c,
+		guildID:        guildID,
+		roleID:         roleID,
+		newPermissions: role.Permissions,
+		c:              c,
 	}
 }
 
@@ -72,14 +76,16 @@ func (r *Role) SetMentionable(mentionable bool) {
 }
 
 func (r *Role) SetPermission(value bool, permission Permission) {
-	role, _ := r.c.client.State.Role(r.guildID, r.roleID)
-	permissions := role.Permissions
 	if value {
-		permissions |= int(permission)
+		r.newPermissions |= int(permission)
 	} else {
-		permissions &= ^int(permission)
+		r.newPermissions &= ^int(permission)
 	}
-	r.c.client.GuildRoleEdit(r.guildID, r.roleID, role.Name, role.Color, true, permissions, role.Mentionable)
+}
+
+func (r *Role) CommitPermissions() {
+	role, _ := r.c.client.State.Role(r.guildID, r.roleID)
+	r.c.client.GuildRoleEdit(r.guildID, r.roleID, role.Name, role.Color, true, r.newPermissions, role.Mentionable)
 }
 
 func (r *Role) CheckPermission(permission Permission) bool {
