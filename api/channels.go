@@ -1,53 +1,40 @@
 package api
 
-// TODO: Deduplicate
 import (
 	"github.com/bwmarrin/discordgo"
 	embed "github.com/clinet/discordgo-embed"
 )
 
-type Channel struct {
+type channel struct {
 	channelID string
 	c         *Connection
 }
 
-func (c *Connection) GetChannel(channelID string) Channel {
-	return Channel{
-		channelID: channelID,
-		c:         c,
-	}
-}
-
-func (st *Channel) GetName() string {
+func (st *channel) GetName() string {
 	channel, _ := st.c.client.Channel(st.channelID)
 	return channel.Name
 }
 
-func (st *Channel) GetParentID() string {
-	channel, _ := st.c.client.Channel(st.channelID)
-	return channel.ParentID
-}
-
-func (st *Channel) SendMessage(text string) string {
+func (st *channel) SendMessage(text string) string {
 	msg, _ := st.c.client.ChannelMessageSend(st.channelID, text)
 	return msg.ID
 }
 
-func (st *Channel) SendEmbedMessage(text string) string {
+func (st *channel) SendEmbedMessage(text string) string {
 	msg, _ := st.c.client.ChannelMessageSendEmbed(st.channelID, embed.NewGenericEmbed("", text))
 	return msg.ID
 }
 
-func (st *Channel) SendEmbedMessageWithTitle(title, caption string) string {
+func (st *channel) SendEmbedMessageWithTitle(title, caption string) string {
 	msg, _ := st.c.client.ChannelMessageSendEmbed(st.channelID, embed.NewGenericEmbed(title, caption))
 	return msg.ID
 }
 
-func (st *Channel) DeleteMessage(msgID string) {
+func (st *channel) DeleteMessage(msgID string) {
 	st.c.client.ChannelMessageDelete(st.channelID, msgID)
 }
 
-func (st *Channel) DeleteMessages(number int) {
+func (st *channel) DeleteMessages(number int) {
 	msgs, _ := st.c.client.ChannelMessages(st.channelID, int(number)+1, "", "", "")
 	// Get msg ids
 	var msgIDs []string
@@ -58,19 +45,19 @@ func (st *Channel) DeleteMessages(number int) {
 	st.c.client.ChannelMessagesBulkDelete(st.channelID, msgIDs)
 }
 
-func (st *Channel) PinMessage(msgID string) {
+func (st *channel) PinMessage(msgID string) {
 	st.c.client.ChannelMessagePin(st.channelID, msgID)
 }
 
-func (st *Channel) UnpinMessage(msgID string) {
+func (st *channel) UnpinMessage(msgID string) {
 	st.c.client.ChannelMessageUnpin(st.channelID, msgID)
 }
 
-func (st *Channel) CreateReaction(msgID, emoji string) {
+func (st *channel) CreateReaction(msgID, emoji string) {
 	st.c.client.MessageReactionAdd(st.channelID, msgID, emoji)
 }
 
-func (st *Channel) GetReactions(msgID, emoji string) []string {
+func (st *channel) GetReactions(msgID, emoji string) []string {
 	users, _ := st.c.client.MessageReactions(st.channelID, msgID, emoji, 100, "", "")
 	userIDs := []string{}
 	for _, user := range users {
@@ -79,7 +66,30 @@ func (st *Channel) GetReactions(msgID, emoji string) []string {
 	return userIDs
 }
 
-func (st *Channel) CreateInviteCode(maxUses int, temporary bool) string {
+func (st *channel) Mention() string {
+	channel, _ := st.c.client.State.Channel(st.channelID)
+	return channel.Mention()
+}
+
+type GuildChannel struct {
+	channel
+}
+
+func (c *Connection) GetChannel(channelID string) GuildChannel {
+	return GuildChannel{
+		channel: channel{
+			channelID: channelID,
+			c:         c,
+		},
+	}
+}
+
+func (st *GuildChannel) GetParentID() string {
+	channel, _ := st.c.client.Channel(st.channelID)
+	return channel.ParentID
+}
+
+func (st *GuildChannel) CreateInviteCode(maxUses int, temporary bool) string {
 	invite, _ := st.c.client.ChannelInviteCreate(st.channelID, discordgo.Invite{
 		MaxAge:    100,
 		MaxUses:   maxUses,
@@ -88,15 +98,23 @@ func (st *Channel) CreateInviteCode(maxUses int, temporary bool) string {
 	return invite.Code
 }
 
-func (st *Channel) Mention() string {
-	channel, _ := st.c.client.State.Channel(st.channelID)
-	return channel.Mention()
-}
-
 // TODO: Implement
 // func (st *Channel) PermissionOverrideCreate() {}
 
 // func (st *Channel) PermissionOverrideDelete() {}
+
+type DMChannel struct {
+	channel
+}
+
+func (c *Connection) GetDMChannel(dmChannelID string) DMChannel {
+	return DMChannel{
+		channel: channel{
+			channelID: dmChannelID,
+			c:         c,
+		},
+	}
+}
 
 type Category struct {
 	channelID string
@@ -116,66 +134,6 @@ func (st *Category) GetName() string {
 }
 
 func (st *Category) Mention() string {
-	channel, _ := st.c.client.State.Channel(st.channelID)
-	return channel.Mention()
-}
-
-// TODO: Implement
-// func (st *Category) PermissionOverrideCreate() {}
-
-// func (st *Category) PermissionOverrideDelete() {}
-
-type DMChannel struct {
-	channelID string
-	c         *Connection
-}
-
-func (c *Connection) GetDMChannel(dmChannelID string) DMChannel {
-	return DMChannel{
-		channelID: dmChannelID,
-		c:         c,
-	}
-}
-
-func (st *DMChannel) GetName() string {
-	channel, _ := st.c.client.Channel(st.channelID)
-	return channel.Name
-}
-
-func (st *DMChannel) SendEmbedMessage(text string) string {
-	msg, _ := st.c.client.ChannelMessageSendEmbed(st.channelID, embed.NewGenericEmbed("", text))
-	return msg.ID
-}
-
-func (st *DMChannel) SendMessage(text string) string {
-	msg, _ := st.c.client.ChannelMessageSend(st.channelID, text)
-	return msg.ID
-}
-
-func (st *DMChannel) DeleteMessage(msgID string) {
-	st.c.client.ChannelMessageDelete(st.channelID, msgID)
-}
-
-func (st *DMChannel) DeleteMessages(number int) {
-	msgs, _ := st.c.client.ChannelMessages(st.channelID, int(number)+1, "", "", "")
-	// Get msg ids
-	var msgIDs []string
-	for _, msg := range msgs {
-		msgIDs = append(msgIDs, msg.ID)
-	}
-	// Delete msgs
-	st.c.client.ChannelMessagesBulkDelete(st.channelID, msgIDs)
-}
-
-func (st *DMChannel) PinMessage(msgID string) {
-	st.c.client.ChannelMessagePin(st.channelID, msgID)
-}
-
-func (st *DMChannel) UnpinMessage(msgID string) {
-	st.c.client.ChannelMessageUnpin(st.channelID, msgID)
-}
-
-func (st *DMChannel) Mention() string {
 	channel, _ := st.c.client.State.Channel(st.channelID)
 	return channel.Mention()
 }
