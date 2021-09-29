@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/AJGherardi/ManageBot/api"
@@ -12,6 +13,7 @@ var (
 )
 
 func main() {
+	fmt.Println("hello")
 	// Get env vars
 	botToken = os.Getenv("TOKEN")
 	guildID = os.Getenv("GUILD_ID")
@@ -20,6 +22,7 @@ func main() {
 	// Regester and handle commands
 	standaloneCommands, parentCommands := getCommands()
 	connection.StartCommandHandler(standaloneCommands, parentCommands, guildID)
+	fmt.Println("running")
 	// Keep the app runing
 	for {
 	}

@@ -132,16 +132,16 @@ func convertToSubcommandOptions(subcommands []SubcommandSinginture) []*dgo.Appli
 	return subcommandOptions
 }
 
-// func deleteAllCommands(client *dgo.Session, guildID string) {
-// 	apps, _ := client.Applications()
-// 	for _, app := range apps {
-// 		cmds, _ := client.ApplicationCommands(app.ID, guildID)
-// 		for _, cmd := range cmds {
-// 			client.ApplicationCommandDelete(cmd.ApplicationID, cmd.ID, guildID)
-// 		}
-// 	}
-// 	cmds, _ := client.ApplicationCommands("", guildID)
-// 	for _, cmd := range cmds {
-// 		client.ApplicationCommandDelete(cmd.ApplicationID, cmd.ID, guildID)
-// 	}
-// }
+func deleteAllCommands(client *dgo.Session, guildID string) {
+	apps, _ := client.Applications()
+	for _, app := range apps {
+		cmds, _ := client.ApplicationCommands(app.ID, guildID)
+		for _, cmd := range cmds {
+			client.ApplicationCommandDelete(cmd.ApplicationID, cmd.ID, guildID)
+		}
+	}
+	cmds, _ := client.ApplicationCommands("", guildID)
+	for _, cmd := range cmds {
+		client.ApplicationCommandDelete(cmd.ApplicationID, cmd.ID, guildID)
+	}
+}
