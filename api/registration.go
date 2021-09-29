@@ -4,35 +4,35 @@ import (
 	dgo "github.com/bwmarrin/discordgo"
 )
 
-// StartCommandHandler Regesters all commands and begines command routing
+// StartCommandHandler Registers all commands and begins command routing
 func (c *Connection) StartCommandHandler(standaloneCommands []StandaloneCommand, parentCommands []ParentCommand, guildID string) {
-	// Regester all standalone commands
-	regesterStandaloneCommands(c, standaloneCommands, guildID)
-	// Regester all parent commands
-	regesterParentCommands(c, parentCommands, guildID)
+	// Register all standalone commands
+	registerStandaloneCommands(c, standaloneCommands, guildID)
+	// Register all parent commands
+	registerParentCommands(c, parentCommands, guildID)
 	// Make handler
 	handle := func(s *dgo.Session, i *dgo.InteractionCreate) {
-		// Makes a reaponse
+		// Makes a response
 		responseData := &dgo.InteractionApplicationCommandResponseData{
 			TTS:     false,
 			Content: "Please wait",
 		}
-		// Sends the inital response
+		// Sends the initial response
 		s.InteractionRespond(i.Interaction, &dgo.InteractionResponse{
 			Type: dgo.InteractionResponseChannelMessage,
 			Data: responseData,
 		})
-		// Chack perms
+		// Check perms
 		var authorized bool
 		for _, roleID := range i.Interaction.Member.Roles {
 			role, _ := s.State.Role(i.GuildID, roleID)
-			permited := (role.Permissions & dgo.PermissionAdministrator) == dgo.PermissionAdministrator
-			if permited {
+			permitted := (role.Permissions & dgo.PermissionAdministrator) == dgo.PermissionAdministrator
+			if permitted {
 				authorized = true
 				break
 			}
 		}
-		// Remove initial reaponse
+		// Remove initial response
 		s.InteractionResponseDelete("", i.Interaction)
 		// Check if authorized
 		if authorized == false {
@@ -40,12 +40,12 @@ func (c *Connection) StartCommandHandler(standaloneCommands []StandaloneCommand,
 			channel.SendMessage("Not Authorized")
 			return
 		}
-		// Route to appliction command handler if standalone command
+		// Route to application command handler if standalone command
 		routeStandaloneCommand(standaloneCommands, i, *c)
 		// Route to application command handler if parent command
 		routeParentCommand(parentCommands, i, *c)
 	}
-	// Regester handler
+	// Register handler
 	c.client.AddHandler(handle)
 }
 
@@ -71,62 +71,62 @@ func routeStandaloneCommand(standaloneCommands []StandaloneCommand, i *dgo.Inter
 	}
 }
 
-func regesterStandaloneCommands(c *Connection, standaloneCommands []StandaloneCommand, guildID string) {
+func registerStandaloneCommands(c *Connection, standaloneCommands []StandaloneCommand, guildID string) {
 	for _, standaloneCommand := range standaloneCommands {
 		// Get command signature
-		standaloneCommandSinginture := standaloneCommand.Regester(*c)
-		// Regester the command
+		standaloneCommandSignature := standaloneCommand.Regester(*c)
+		// Register the command
 		c.client.ApplicationCommandCreate(
 			"",
 			&dgo.ApplicationCommand{
-				Name:        standaloneCommandSinginture.Name,
-				Description: standaloneCommandSinginture.Description,
-				Options:     convertToParmOptions(standaloneCommandSinginture.Parms),
+				Name:        standaloneCommandSignature.Name,
+				Description: standaloneCommandSignature.Description,
+				Options:     convertToParamOptions(standaloneCommandSignature.Parms),
 			},
 			guildID,
 		)
 	}
 }
 
-func regesterParentCommands(c *Connection, parentCommands []ParentCommand, guildID string) {
+func registerParentCommands(c *Connection, parentCommands []ParentCommand, guildID string) {
 	for _, parentCommand := range parentCommands {
 		// Get parent signature
-		parentCommandSinginture := parentCommand.Regester(*c)
-		// Get subcommand singintures
-		subcommandSingintures := []SubcommandSinginture{}
+		parentCommandSignature := parentCommand.Regester(*c)
+		// Get subcommand signatures
+		subcommandSignatures := []SubcommandSinginture{}
 		for _, subcommand := range parentCommand.Subcommands() {
-			subcommandSinginture := subcommand.Regester(*c)
-			subcommandSingintures = append(subcommandSingintures, subcommandSinginture)
+			subcommandSignature := subcommand.Regester(*c)
+			subcommandSignatures = append(subcommandSignatures, subcommandSignature)
 		}
-		// Regester the command
+		// Register the command
 		c.client.ApplicationCommandCreate(
 			"",
 			&dgo.ApplicationCommand{
-				Name:        parentCommandSinginture.Name,
-				Description: parentCommandSinginture.Description,
-				Options:     convertToSubcommandOptions(subcommandSingintures),
+				Name:        parentCommandSignature.Name,
+				Description: parentCommandSignature.Description,
+				Options:     convertToSubcommandOptions(subcommandSignatures),
 			},
 			guildID,
 		)
 	}
 }
 
-func convertToParmOptions(parms []ParmSinginture) []*dgo.ApplicationCommandOption {
+func convertToParamOptions(params []ParmSinginture) []*dgo.ApplicationCommandOption {
 	options := []*dgo.ApplicationCommandOption{}
-	for _, parmSinginture := range parms {
-		options = append(options, parmSinginture.Build())
+	for _, paramSignature := range params {
+		options = append(options, paramSignature.Build())
 	}
 	return options
 }
 
 func convertToSubcommandOptions(subcommands []SubcommandSinginture) []*dgo.ApplicationCommandOption {
 	subcommandOptions := []*dgo.ApplicationCommandOption{}
-	for _, subcommandSinginture := range subcommands {
+	for _, subcommandSignature := range subcommands {
 		subcommandOptions = append(subcommandOptions, &dgo.ApplicationCommandOption{
-			Name:        subcommandSinginture.Name,
-			Description: subcommandSinginture.Description,
+			Name:        subcommandSignature.Name,
+			Description: subcommandSignature.Description,
 			Type:        dgo.ApplicationCommandOptionSubCommand,
-			Options:     convertToParmOptions(subcommandSinginture.Parms),
+			Options:     convertToParamOptions(subcommandSignature.Parms),
 		})
 	}
 	return subcommandOptions

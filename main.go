@@ -19,16 +19,16 @@ func main() {
 	guildID = os.Getenv("GUILD_ID")
 	// Get connection
 	connection := api.ConnectToDiscord(botToken, guildID)
-	// Regester and handle commands
+	// Register and handle commands
 	standaloneCommands, parentCommands := getCommands()
 	connection.StartCommandHandler(standaloneCommands, parentCommands, guildID)
 	fmt.Println("running")
-	// Keep the app runing
+	// Keep the app running
 	for {
 	}
 }
 
-// Returns a list of top lever commands standalone and parrent
+// Returns a list of top lever commands standalone and parent
 func getCommands() ([]api.StandaloneCommand, []api.ParentCommand) {
 	return []api.StandaloneCommand{
 			&commands.InitHandler{},

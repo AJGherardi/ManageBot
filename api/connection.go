@@ -15,9 +15,7 @@ func ConnectToDiscord(botToken, guildID string) Connection {
 	client, _ := dgo.New("Bot " + botToken)
 	// Set intents
 	client.Identify.Intents = dgo.MakeIntent(
-		dgo.IntentsAllWithoutPrivileged |
-			dgo.IntentsGuildPresences |
-			dgo.IntentsGuildMembers,
+		dgo.IntentsAllWithoutPrivileged,
 	)
 	// Opens the connection
 	client.Open()
