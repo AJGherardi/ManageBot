@@ -1,3 +1,5 @@
 build:
   docker:
     worker: prod.dockerfile
+run:
+  worker: /app
