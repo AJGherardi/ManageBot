@@ -83,7 +83,7 @@ func registerStandaloneCommands(c *Connection, standaloneCommands []StandaloneCo
 				Description: standaloneCommandSignature.Description,
 				Options:     convertToParamOptions(standaloneCommandSignature.Parms),
 			},
-			guildID,
+			"",
 		)
 	}
 }
