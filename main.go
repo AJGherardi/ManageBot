@@ -17,6 +17,7 @@ func main() {
 	// Get env vars
 	botToken = os.Getenv("TOKEN")
 	guildID = os.Getenv("GUILD_ID")
+	fmt.Println(guildID)
 	// Get connection
 	connection := api.ConnectToDiscord(botToken, guildID)
 	// Register and handle commands
