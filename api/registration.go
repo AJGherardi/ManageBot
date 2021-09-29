@@ -23,23 +23,23 @@ func (c *Connection) StartCommandHandler(standaloneCommands []StandaloneCommand,
 			Data: responseData,
 		})
 		// Check perms
-		var authorized bool
-		for _, roleID := range i.Interaction.Member.Roles {
-			role, _ := s.State.Role(i.GuildID, roleID)
-			permitted := (role.Permissions & dgo.PermissionAdministrator) == dgo.PermissionAdministrator
-			if permitted {
-				authorized = true
-				break
-			}
-		}
+		//var authorized bool
+		//for _, roleID := range i.Interaction.Member.Roles {
+		//	role, _ := s.State.Role(i.GuildID, roleID)
+		//	permitted := (role.Permissions & dgo.PermissionAdministrator) == dgo.PermissionAdministrator
+		//	if permitted {
+		//		authorized = true
+		//		break
+		//	}
+		//}
 		// Remove initial response
 		s.InteractionResponseDelete("", i.Interaction)
 		// Check if authorized
-		if authorized == false {
-			channel := c.GetChannel(i.ChannelID)
-			channel.SendMessage("Not Authorized")
-			return
-		}
+		//if authorized == false {
+		//	channel := c.GetChannel(i.ChannelID)
+		//	channel.SendMessage("Not Authorized")
+		//	return
+		//}
 		// Route to application command handler if standalone command
 		routeStandaloneCommand(standaloneCommands, i, *c)
 		// Route to application command handler if parent command
