@@ -31,18 +31,18 @@ func main() {
 // Returns a list of top lever commands standalone and parent
 func getCommands() ([]api.StandaloneCommand, []api.ParentCommand) {
 	return []api.StandaloneCommand{
-			&commands.InitHandler{},
-			&commands.InviteHandler{},
+			//&commands.InitHandler{},
+			//&commands.InviteHandler{},
 			&commands.KickHandler{},
 			&commands.NicknameHandler{},
 			&commands.PurgeHandler{},
 			&commands.WarnHandler{},
 			&commands.StatsHandler{},
-			&commands.VoteHandler{},
+			//&commands.VoteHandler{},
 		}, []api.ParentCommand{
 			&commands.ChannelHandler{},
 			&commands.SayHandler{},
-			&commands.RemindHandler{},
-			&commands.RoleHandler{},
+			//&commands.RemindHandler{},
+			//&commands.RoleHandler{},
 		}
 }

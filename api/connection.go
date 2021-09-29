@@ -20,7 +20,7 @@ func ConnectToDiscord(botToken, guildID string) Connection {
 	// Opens the connection
 	client.Open()
 	// Remove all commands
-	deleteAllCommands(client, guildID)
+	//deleteAllCommands(client, guildID)
 	return Connection{client: client}
 }
 
