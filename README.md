@@ -1,4 +1,5 @@
+## Archive notice
+This project was created for educational purposes. And was never intended for use in any production setting. To prevent forks and attempts to contribute I have archived it.
+
 ## What is ManageBot
-Managebot is a discord bot made to handle all tasks that a discord server manager would want to complete. Its also easy to use thanks to discord's new / commands.
-## Can I use ManageBot
-Na it was just a fun project for the time but you are welcome to use it if you would like to.
+Managebot is a discord bot made to handle common tasks that a discord server manager would want to complete. Its also easy to use thanks to discord's addition of slash commands.
