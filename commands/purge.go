@@ -20,8 +20,8 @@ func (h *PurgeHandler) Callback(i api.StandaloneCommandInvocation, c api.Connect
 	channel.SendEmbedMessage("Removed " + fmt.Sprint(i.GetIntParm(0)) + " messages")
 }
 
-func (h *PurgeHandler) Regester(c api.Connection) api.StandaloneCommandSinginture {
-	return api.MakeStandaloneCommandSinginture("purge", "Removes specified number of msgs from current channel",
-		api.MakeIntParmSinginture("Number", "Number of messages to remove", true),
+func (h *PurgeHandler) Regester(c api.Connection) api.StandaloneCommandSignature {
+	return api.MakeStandaloneCommandSignature("purge", "Removes specified number of msgs from current channel",
+		api.MakeIntParmSignature("Number", "Number of messages to remove", true),
 	)
 }

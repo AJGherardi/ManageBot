@@ -44,6 +44,6 @@ func (h *StatsHandler) Callback(i api.StandaloneCommandInvocation, c api.Connect
 	channel.SendEmbedMessage("There are " + fmt.Sprint(boosting) + " people boosting your server")
 }
 
-func (h *StatsHandler) Regester(c api.Connection) api.StandaloneCommandSinginture {
-	return api.MakeStandaloneCommandSinginture("stats", "Shows stats of a server or channel")
+func (h *StatsHandler) Regester(c api.Connection) api.StandaloneCommandSignature {
+	return api.MakeStandaloneCommandSignature("stats", "Shows stats of a server or channel")
 }

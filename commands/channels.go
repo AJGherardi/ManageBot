@@ -19,8 +19,8 @@ func (h *ChannelHandler) Subcommands() []api.Subcommand {
 	}
 }
 
-func (h *ChannelHandler) Regester(c api.Connection) api.ParentCommandSinginture {
-	return api.MakeParentCommandSinginture("channel", "Manage channels")
+func (h *ChannelHandler) Regester(c api.Connection) api.ParentCommandSignature {
+	return api.MakeParentCommandSignature("channel", "Manage channels")
 }
 
 type createChannelHandler struct{}
@@ -37,17 +37,17 @@ func (h *createChannelHandler) Callback(i api.SubcommandInvocation, c api.Connec
 	channel.SendEmbedMessage("Added channel " + channel.Mention())
 }
 
-func (h *createChannelHandler) Regester(c api.Connection) api.SubcommandSinginture {
-	return api.MakeSubcommandSinginture(
+func (h *createChannelHandler) Regester(c api.Connection) api.SubcommandSignature {
+	return api.MakeSubcommandSignature(
 		"create", "Adds a channel",
-		api.MakeStringParmSinginture("Name", "Name to give new channel", true),
-		api.MakeChannelParmSinginture("Category", "Category to add channel to", true),
-		api.MakeParmSingintureWithChoices(
+		api.MakeStringParmSignature("Name", "Name to give new channel", true),
+		api.MakeChannelParmSignature("Category", "Category to add channel to", true),
+		api.MakeParmSignatureWithChoices(
 			"Type", "Type of new channel", true,
 			api.Choice{Name: "Text", Value: dgo.ChannelTypeGuildText},
 			api.Choice{Name: "Voice", Value: dgo.ChannelTypeGuildVoice},
 		),
-		api.MakeBoolParmSinginture("NSFW", "Contains explicit material only applys to text channels", true),
+		api.MakeBoolParmSignature("NSFW", "Contains explicit material only applies to text channels", true),
 	)
 }
 
@@ -65,10 +65,10 @@ func (h *createGroupChannelHandler) Callback(i api.SubcommandInvocation, c api.C
 	category.SendEmbedMessage("Added channel group " + category.Mention())
 }
 
-func (h *createGroupChannelHandler) Regester(c api.Connection) api.SubcommandSinginture {
-	return api.MakeSubcommandSinginture(
+func (h *createGroupChannelHandler) Regester(c api.Connection) api.SubcommandSignature {
+	return api.MakeSubcommandSignature(
 		"create-group", "Adds a channel group",
-		api.MakeStringParmSinginture("Name", "Name to give new channel group", true),
+		api.MakeStringParmSignature("Name", "Name to give new channel group", true),
 	)
 }
 
@@ -86,9 +86,9 @@ func (h *deleteChannelHandler) Callback(i api.SubcommandInvocation, c api.Connec
 	channel.SendEmbedMessage("Deleted channel " + channel.GetName())
 }
 
-func (h *deleteChannelHandler) Regester(c api.Connection) api.SubcommandSinginture {
-	return api.MakeSubcommandSinginture(
+func (h *deleteChannelHandler) Regester(c api.Connection) api.SubcommandSignature {
+	return api.MakeSubcommandSignature(
 		"delete", "Remove a channel",
-		api.MakeChannelParmSinginture("Channel", "Channel to remove", true),
+		api.MakeChannelParmSignature("Channel", "Channel to remove", true),
 	)
 }

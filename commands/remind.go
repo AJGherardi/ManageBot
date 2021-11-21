@@ -28,8 +28,8 @@ func (h *RemindHandler) Subcommands() []api.Subcommand {
 	}
 }
 
-func (h *RemindHandler) Regester(c api.Connection) api.ParentCommandSinginture {
-	return api.MakeParentCommandSinginture("remind", "Manage reminders")
+func (h *RemindHandler) Regester(c api.Connection) api.ParentCommandSignature {
+	return api.MakeParentCommandSignature("remind", "Manage reminders")
 }
 
 type setRemindHandler struct{}
@@ -55,11 +55,11 @@ func (h *setRemindHandler) Callback(i api.SubcommandInvocation, c api.Connection
 	})
 }
 
-func (h *setRemindHandler) Regester(c api.Connection) api.SubcommandSinginture {
-	return api.MakeSubcommandSinginture(
+func (h *setRemindHandler) Regester(c api.Connection) api.SubcommandSignature {
+	return api.MakeSubcommandSignature(
 		"set", "Set a reminder",
-		api.MakeStringParmSinginture("Title", "Title of reminder", true),
-		api.MakeIntParmSinginture("Time", "How many min until reminder", true),
+		api.MakeStringParmSignature("Title", "Title of reminder", true),
+		api.MakeIntParmSignature("Time", "How many min until reminder", true),
 	)
 }
 
@@ -77,8 +77,8 @@ func (h *viewRemindHandler) Callback(i api.SubcommandInvocation, c api.Connectio
 	}
 }
 
-func (h *viewRemindHandler) Regester(c api.Connection) api.SubcommandSinginture {
-	return api.MakeSubcommandSinginture("view", "View reminders")
+func (h *viewRemindHandler) Regester(c api.Connection) api.SubcommandSignature {
+	return api.MakeSubcommandSignature("view", "View reminders")
 }
 
 type deleteRemindHandler struct{}
@@ -96,10 +96,10 @@ func (h *deleteRemindHandler) Callback(i api.SubcommandInvocation, c api.Connect
 	reminders = removeRemind(reminders, i.GetIntParm(0))
 }
 
-func (h *deleteRemindHandler) Regester(c api.Connection) api.SubcommandSinginture {
-	return api.MakeSubcommandSinginture(
+func (h *deleteRemindHandler) Regester(c api.Connection) api.SubcommandSignature {
+	return api.MakeSubcommandSignature(
 		"delete", "Deletes the reminder at the given index",
-		api.MakeIntParmSinginture("Index", "Index of reminder", true),
+		api.MakeIntParmSignature("Index", "Index of reminder", true),
 	)
 }
 

@@ -4,63 +4,63 @@ import (
 	dgo "github.com/bwmarrin/discordgo"
 )
 
-// StandaloneCommandSinginture describes a command with no subcommands to be registered with the discord api
-type StandaloneCommandSinginture struct {
+// StandaloneCommandSignature describes a command with no subcommands to be registered with the discord api
+type StandaloneCommandSignature struct {
 	Name, Description string
-	Parms             []ParmSinginture
+	Parms             []ParmSignature
 }
 
-// MakeStandaloneCommandSinginture Creates and returns a signiture for a StandaloneCommand
-func MakeStandaloneCommandSinginture(name, description string, parms ...ParmSinginture) StandaloneCommandSinginture {
-	return StandaloneCommandSinginture{
+// MakeStandaloneCommandSignature Creates and returns a signature for a StandaloneCommand
+func MakeStandaloneCommandSignature(name, description string, parms ...ParmSignature) StandaloneCommandSignature {
+	return StandaloneCommandSignature{
 		Name:        name,
 		Description: description,
 		Parms:       parms,
 	}
 }
 
-// ParentCommandSinginture describes a command with subcommands to be registered with the discord api
-type ParentCommandSinginture struct {
+// ParentCommandSignature describes a command with subcommands to be registered with the discord api
+type ParentCommandSignature struct {
 	Name, Description string
 }
 
-// MakeParentCommandSinginture Creates and returns a signiture for a ParentCommand
-func MakeParentCommandSinginture(name, description string) ParentCommandSinginture {
-	return ParentCommandSinginture{
+// MakeParentCommandSignature Creates and returns a signature for a ParentCommand
+func MakeParentCommandSignature(name, description string) ParentCommandSignature {
+	return ParentCommandSignature{
 		Name:        name,
 		Description: description,
 	}
 }
 
-// SubcommandSinginture describes a subcommands to be registered with the discord api
-type SubcommandSinginture struct {
+// SubcommandSignature describes a subcommands to be registered with the discord api
+type SubcommandSignature struct {
 	Name, Description string
-	Parms             []ParmSinginture
+	Parms             []ParmSignature
 }
 
-// MakeSubcommandSinginture Creates and returns a signiture for a Subcommand
-func MakeSubcommandSinginture(name, description string, parms ...ParmSinginture) SubcommandSinginture {
-	return SubcommandSinginture{
+// MakeSubcommandSignature Creates and returns a signature for a Subcommand
+func MakeSubcommandSignature(name, description string, parms ...ParmSignature) SubcommandSignature {
+	return SubcommandSignature{
 		Name:        name,
 		Description: description,
 		Parms:       parms,
 	}
 }
 
-// ParmSinginture describes a paramater to be registered with the discord api
-type ParmSinginture interface {
+// ParmSignature describes a paramater to be registered with the discord api
+type ParmSignature interface {
 	Build() *dgo.ApplicationCommandOption
 }
 
-// UnconstrainedParmSinginture is a parm singinture that dose not provide any required choices
-type UnconstrainedParmSinginture struct {
+// UnconstrainedParmSignature is a parm signature that dose not provide any required choices
+type UnconstrainedParmSignature struct {
 	Name, Description string
 	Type              uint8
 	Required          bool
 }
 
-// Build Converts a ParmSinginture to application command option
-func (p UnconstrainedParmSinginture) Build() *dgo.ApplicationCommandOption {
+// Build Converts a ParmSignature to application command option
+func (p UnconstrainedParmSignature) Build() *dgo.ApplicationCommandOption {
 	return &dgo.ApplicationCommandOption{
 		Name:        p.Name,
 		Description: p.Description,
@@ -69,38 +69,38 @@ func (p UnconstrainedParmSinginture) Build() *dgo.ApplicationCommandOption {
 	}
 }
 
-// MakeIntParmSinginture Creates and returns a signiture for a intager parm
-func MakeIntParmSinginture(name, description string, required bool) ParmSinginture {
-	return makeParmSingitureWithType(name, description, required, uint8(dgo.ApplicationCommandOptionInteger))
+// MakeIntParmSignature Creates and returns a signature for a integer parm
+func MakeIntParmSignature(name, description string, required bool) ParmSignature {
+	return makeParmSignatureWithType(name, description, required, uint8(dgo.ApplicationCommandOptionInteger))
 }
 
-// MakeStringParmSinginture Creates and returns a signiture for a string parm
-func MakeStringParmSinginture(name, description string, required bool) ParmSinginture {
-	return makeParmSingitureWithType(name, description, required, uint8(dgo.ApplicationCommandOptionString))
+// MakeStringParmSignature Creates and returns a signature for a string parm
+func MakeStringParmSignature(name, description string, required bool) ParmSignature {
+	return makeParmSignatureWithType(name, description, required, uint8(dgo.ApplicationCommandOptionString))
 }
 
-// MakeBoolParmSinginture Creates and returns a signiture for a bool parm
-func MakeBoolParmSinginture(name, description string, required bool) ParmSinginture {
-	return makeParmSingitureWithType(name, description, required, uint8(dgo.ApplicationCommandOptionBoolean))
+// MakeBoolParmSignature Creates and returns a signature for a bool parm
+func MakeBoolParmSignature(name, description string, required bool) ParmSignature {
+	return makeParmSignatureWithType(name, description, required, uint8(dgo.ApplicationCommandOptionBoolean))
 }
 
-// MakeChannelParmSinginture Creates and returns a signiture for a channel parm
-func MakeChannelParmSinginture(name, description string, required bool) ParmSinginture {
-	return makeParmSingitureWithType(name, description, required, uint8(dgo.ApplicationCommandOptionChannel))
+// MakeChannelParmSignature Creates and returns a signature for a channel parm
+func MakeChannelParmSignature(name, description string, required bool) ParmSignature {
+	return makeParmSignatureWithType(name, description, required, uint8(dgo.ApplicationCommandOptionChannel))
 }
 
-// MakeUserParmSinginture Creates and returns a signiture for a user parm
-func MakeUserParmSinginture(name, description string, required bool) ParmSinginture {
-	return makeParmSingitureWithType(name, description, required, uint8(dgo.ApplicationCommandOptionUser))
+// MakeUserParmSignature Creates and returns a signature for a user parm
+func MakeUserParmSignature(name, description string, required bool) ParmSignature {
+	return makeParmSignatureWithType(name, description, required, uint8(dgo.ApplicationCommandOptionUser))
 }
 
-// MakeRoleParmSinginture Creates and returns a signiture for a role parm
-func MakeRoleParmSinginture(name, description string, required bool) ParmSinginture {
-	return makeParmSingitureWithType(name, description, required, uint8(dgo.ApplicationCommandOptionRole))
+// MakeRoleParmSignature Creates and returns a signature for a role parm
+func MakeRoleParmSignature(name, description string, required bool) ParmSignature {
+	return makeParmSignatureWithType(name, description, required, uint8(dgo.ApplicationCommandOptionRole))
 }
 
-func makeParmSingitureWithType(name, description string, required bool, parmType uint8) ParmSinginture {
-	return UnconstrainedParmSinginture{
+func makeParmSignatureWithType(name, description string, required bool, parmType uint8) ParmSignature {
+	return UnconstrainedParmSignature{
 		Name:        name,
 		Description: description,
 		Required:    required,
@@ -108,16 +108,16 @@ func makeParmSingitureWithType(name, description string, required bool, parmType
 	}
 }
 
-// ConstrainedParmSinginture is a parm singinture that has a list of required choices
-type ConstrainedParmSinginture struct {
+// ConstrainedParmSignature is a parm signature that has a list of required choices
+type ConstrainedParmSignature struct {
 	Name, Description string
 	Type              uint8
 	Required          bool
 	Choices           []Choice
 }
 
-// Build Converts a ParmSinginture to application command option
-func (p ConstrainedParmSinginture) Build() *dgo.ApplicationCommandOption {
+// Build Converts a ParmSignature to application command option
+func (p ConstrainedParmSignature) Build() *dgo.ApplicationCommandOption {
 	// Build choices
 	parmChoices := []*dgo.ApplicationCommandOptionChoice{}
 	for _, choice := range p.Choices {
@@ -146,9 +146,9 @@ func (c Choice) Build() *dgo.ApplicationCommandOptionChoice {
 	}
 }
 
-// MakeParmSingintureWithChoices returns a parm with required choices
-func MakeParmSingintureWithChoices(name, description string, required bool, choices ...Choice) ParmSinginture {
-	return ConstrainedParmSinginture{
+// MakeParmSignatureWithChoices returns a parm with required choices
+func MakeParmSignatureWithChoices(name, description string, required bool, choices ...Choice) ParmSignature {
+	return ConstrainedParmSignature{
 		Name:        name,
 		Description: description,
 		Required:    required,

@@ -10,7 +10,7 @@ type StandaloneCommand interface {
 	Callback(i StandaloneCommandInvocation, c Connection)
 	// Builds and returns a descscription of a application command and its parameters
 	// which is regestred with the discord api
-	Regester(c Connection) StandaloneCommandSinginture
+	Regester(c Connection) StandaloneCommandSignature
 }
 
 // ParentCommand defines the behavior of a parent command which contains subcommands
@@ -21,7 +21,7 @@ type ParentCommand interface {
 	Subcommands() []Subcommand
 	// Builds and returns a descscription of a parent command
 	// which is regestered at the same time as the parrent command
-	Regester(c Connection) ParentCommandSinginture
+	Regester(c Connection) ParentCommandSignature
 }
 
 // Subcommand defines the behavior of a parent commands subcommand
@@ -32,14 +32,14 @@ type Subcommand interface {
 	Callback(i SubcommandInvocation, c Connection)
 	// Builds and returns a descscription of a subcommand and its parameters
 	// which is regestered at the same time as the parrent command
-	Regester(c Connection) SubcommandSinginture
+	Regester(c Connection) SubcommandSignature
 }
 
 type invocation struct {
 	i *dgo.InteractionCreate
 }
 
-// StandaloneCommandInvocation Wrapes a discord interaction and makes it easyer to get parameters
+// StandaloneCommandInvocation Wraps a discord interaction and makes it easier to get parameters
 type StandaloneCommandInvocation struct {
 	invocation
 }
@@ -74,7 +74,7 @@ func (i *StandaloneCommandInvocation) GetBoolParm(index int) bool {
 	return i.i.Interaction.Data.Options[index].Value.(bool)
 }
 
-// SubcommandInvocation Wrapes a discord interaction and makes it easyer to get parameters
+// SubcommandInvocation Wraps a discord interaction and makes it easier to get parameters
 type SubcommandInvocation struct {
 	invocation
 }

@@ -10,8 +10,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-// TODO: Implment locks
-
 // ServerData holds all persistant information that is needed to manage a discord guild
 type ServerData struct {
 	GuildID string `bson:"guildID,omitempty"`
@@ -31,7 +29,7 @@ func (s *ServerData) ChangeName(name string) {
 	s.Name = name
 }
 
-// GetName retuens the servers name
+// GetName returns the servers name
 func (s *ServerData) GetName() string {
 	return s.Name
 }
@@ -42,7 +40,7 @@ type DB interface {
 	OpenServer(guildID string) ServerData
 	CreateServer(ServerData)
 	DeleteServer(guildID string)
-	CloseServerWithReplacment(guildID string, replacement ServerData)
+	CloseServerWithReplacement(guildID string, replacement ServerData)
 }
 
 // MongoDB holds and abstracts access to the mongo database and its collections
@@ -90,8 +88,8 @@ func (d *MongoDB) DeleteServer(guildID string) {
 	d.servers.DeleteOne(context.Background(), ServerData{GuildID: guildID})
 }
 
-// CloseServerWithReplacment replaces the server at the given guild id
-func (d *MongoDB) CloseServerWithReplacment(guildID string, replacement ServerData) {
+// CloseServerWithReplacement replaces the server at the given guild id
+func (d *MongoDB) CloseServerWithReplacement(guildID string, replacement ServerData) {
 	d.servers.ReplaceOne(context.Background(), ServerData{GuildID: guildID}, replacement)
 }
 

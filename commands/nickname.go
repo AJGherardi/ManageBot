@@ -19,9 +19,9 @@ func (h *NicknameHandler) Callback(i api.StandaloneCommandInvocation, c api.Conn
 	channel.SendEmbedMessage("Changed Nickname")
 }
 
-func (h *NicknameHandler) Regester(c api.Connection) api.StandaloneCommandSinginture {
-	return api.MakeStandaloneCommandSinginture("nickname", "Changes a server members nickname",
-		api.MakeUserParmSinginture("User", "User that will have nickname changed", true),
-		api.MakeStringParmSinginture("Nickname", "New Nickname", true),
+func (h *NicknameHandler) Regester(c api.Connection) api.StandaloneCommandSignature {
+	return api.MakeStandaloneCommandSignature("nickname", "Changes a server members nickname",
+		api.MakeUserParmSignature("User", "User that will have nickname changed", true),
+		api.MakeStringParmSignature("Nickname", "New Nickname", true),
 	)
 }

@@ -23,23 +23,23 @@ func (c *Connection) StartCommandHandler(standaloneCommands []StandaloneCommand,
 			Data: responseData,
 		})
 		// Check perms
-		//var authorized bool
-		//for _, roleID := range i.Interaction.Member.Roles {
-		//	role, _ := s.State.Role(i.GuildID, roleID)
-		//	permitted := (role.Permissions & dgo.PermissionAdministrator) == dgo.PermissionAdministrator
-		//	if permitted {
-		//		authorized = true
-		//		break
-		//	}
-		//}
+		var authorized bool
+		for _, roleID := range i.Interaction.Member.Roles {
+			role, _ := s.State.Role(i.GuildID, roleID)
+			permitted := (role.Permissions & dgo.PermissionAdministrator) == dgo.PermissionAdministrator
+			if permitted {
+				authorized = true
+				break
+			}
+		}
 		// Remove initial response
 		s.InteractionResponseDelete("", i.Interaction)
 		// Check if authorized
-		//if authorized == false {
-		//	channel := c.GetChannel(i.ChannelID)
-		//	channel.SendMessage("Not Authorized")
-		//	return
-		//}
+		if authorized == false {
+			channel := c.GetChannel(i.ChannelID)
+			channel.SendMessage("Not Authorized")
+			return
+		}
 		// Route to application command handler if standalone command
 		routeStandaloneCommand(standaloneCommands, i, *c)
 		// Route to application command handler if parent command
@@ -93,7 +93,7 @@ func registerParentCommands(c *Connection, parentCommands []ParentCommand, guild
 		// Get parent signature
 		parentCommandSignature := parentCommand.Regester(*c)
 		// Get subcommand signatures
-		subcommandSignatures := []SubcommandSinginture{}
+		subcommandSignatures := []SubcommandSignature{}
 		for _, subcommand := range parentCommand.Subcommands() {
 			subcommandSignature := subcommand.Regester(*c)
 			subcommandSignatures = append(subcommandSignatures, subcommandSignature)
@@ -111,7 +111,7 @@ func registerParentCommands(c *Connection, parentCommands []ParentCommand, guild
 	}
 }
 
-func convertToParamOptions(params []ParmSinginture) []*dgo.ApplicationCommandOption {
+func convertToParamOptions(params []ParmSignature) []*dgo.ApplicationCommandOption {
 	options := []*dgo.ApplicationCommandOption{}
 	for _, paramSignature := range params {
 		options = append(options, paramSignature.Build())
@@ -119,7 +119,7 @@ func convertToParamOptions(params []ParmSinginture) []*dgo.ApplicationCommandOpt
 	return options
 }
 
-func convertToSubcommandOptions(subcommands []SubcommandSinginture) []*dgo.ApplicationCommandOption {
+func convertToSubcommandOptions(subcommands []SubcommandSignature) []*dgo.ApplicationCommandOption {
 	subcommandOptions := []*dgo.ApplicationCommandOption{}
 	for _, subcommandSignature := range subcommands {
 		subcommandOptions = append(subcommandOptions, &dgo.ApplicationCommandOption{

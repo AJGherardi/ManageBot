@@ -90,8 +90,8 @@ func (r *Role) CommitPermissions() {
 
 func (r *Role) CheckPermission(permission Permission) bool {
 	role, _ := r.c.client.State.Role(r.guildID, r.roleID)
-	permited := (role.Permissions & int(permission)) == int(permission)
-	return permited
+	permitted := (role.Permissions & int(permission)) == int(permission)
+	return permitted
 }
 
 func (r *Role) Mention() string {

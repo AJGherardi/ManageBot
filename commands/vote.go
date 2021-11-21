@@ -35,11 +35,11 @@ func (h *VoteHandler) Callback(i api.StandaloneCommandInvocation, c api.Connecti
 	)
 }
 
-func (h *VoteHandler) Regester(c api.Connection) api.StandaloneCommandSinginture {
-	return api.MakeStandaloneCommandSinginture(
+func (h *VoteHandler) Regester(c api.Connection) api.StandaloneCommandSignature {
+	return api.MakeStandaloneCommandSignature(
 		"vote", "Make a vote",
-		api.MakeStringParmSinginture("Title", "Title of vote message", true),
-		api.MakeStringParmSinginture("Caption", "Caption for vote message", true),
-		api.MakeIntParmSinginture("Time", "Time till end of vote in min", true),
+		api.MakeStringParmSignature("Title", "Title of vote message", true),
+		api.MakeStringParmSignature("Caption", "Caption for vote message", true),
+		api.MakeIntParmSignature("Time", "Time till end of vote in min", true),
 	)
 }

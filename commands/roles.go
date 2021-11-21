@@ -23,8 +23,8 @@ func (h *RoleHandler) Subcommands() []api.Subcommand {
 	}
 }
 
-func (h *RoleHandler) Regester(c api.Connection) api.ParentCommandSinginture {
-	return api.MakeParentCommandSinginture("role", "Manage user roles")
+func (h *RoleHandler) Regester(c api.Connection) api.ParentCommandSignature {
+	return api.MakeParentCommandSignature("role", "Manage user roles")
 }
 
 type createRoleHandler struct{}
@@ -43,10 +43,10 @@ func (h *createRoleHandler) Callback(i api.SubcommandInvocation, c api.Connectio
 	channel.SendEmbedMessage("Added role " + role.Mention())
 }
 
-func (h *createRoleHandler) Regester(c api.Connection) api.SubcommandSinginture {
-	return api.MakeSubcommandSinginture(
+func (h *createRoleHandler) Regester(c api.Connection) api.SubcommandSignature {
+	return api.MakeSubcommandSignature(
 		"create", "Makes a new role",
-		api.MakeStringParmSinginture("Name", "Role name", true),
+		api.MakeStringParmSignature("Name", "Role name", true),
 	)
 }
 
@@ -68,10 +68,10 @@ func (h *deleteRoleHandler) Callback(i api.SubcommandInvocation, c api.Connectio
 	channel.SendEmbedMessage("Deleted role " + roleName)
 }
 
-func (h *deleteRoleHandler) Regester(c api.Connection) api.SubcommandSinginture {
-	return api.MakeSubcommandSinginture(
+func (h *deleteRoleHandler) Regester(c api.Connection) api.SubcommandSignature {
+	return api.MakeSubcommandSignature(
 		"delete", "Removes a role",
-		api.MakeRoleParmSinginture("Role", "Role to remove", true),
+		api.MakeRoleParmSignature("Role", "Role to remove", true),
 	)
 }
 
@@ -93,11 +93,11 @@ func (h *assignRoleHandler) Callback(i api.SubcommandInvocation, c api.Connectio
 	channel.SendEmbedMessage("Added role " + role.Mention() + " to " + user.Mention())
 }
 
-func (h *assignRoleHandler) Regester(c api.Connection) api.SubcommandSinginture {
-	return api.MakeSubcommandSinginture(
+func (h *assignRoleHandler) Regester(c api.Connection) api.SubcommandSignature {
+	return api.MakeSubcommandSignature(
 		"assign", "Adds a role to a user",
-		api.MakeUserParmSinginture("User", "User to add role to", true),
-		api.MakeRoleParmSinginture("Role", "Role to add", true),
+		api.MakeUserParmSignature("User", "User to add role to", true),
+		api.MakeRoleParmSignature("Role", "Role to add", true),
 	)
 }
 
@@ -119,11 +119,11 @@ func (h *revokeRoleHandler) Callback(i api.SubcommandInvocation, c api.Connectio
 	channel.SendEmbedMessage("Removed role " + role.Mention() + " to " + user.Mention())
 }
 
-func (h *revokeRoleHandler) Regester(c api.Connection) api.SubcommandSinginture {
-	return api.MakeSubcommandSinginture(
+func (h *revokeRoleHandler) Regester(c api.Connection) api.SubcommandSignature {
+	return api.MakeSubcommandSignature(
 		"revoke", "Revokes a current role form a user",
-		api.MakeUserParmSinginture("User", "User to remove role from", true),
-		api.MakeRoleParmSinginture("Role", "Role to remove", true),
+		api.MakeUserParmSignature("User", "User to remove role from", true),
+		api.MakeRoleParmSignature("Role", "Role to remove", true),
 	)
 }
 
@@ -149,18 +149,18 @@ func (h *generalPermissionsSetRoleHandler) Callback(i api.SubcommandInvocation, 
 	role.CommitPermissions()
 }
 
-func (h *generalPermissionsSetRoleHandler) Regester(c api.Connection) api.SubcommandSinginture {
-	return api.MakeSubcommandSinginture(
+func (h *generalPermissionsSetRoleHandler) Regester(c api.Connection) api.SubcommandSignature {
+	return api.MakeSubcommandSignature(
 		"general-permissions-set", "Sets general permissions for a role",
-		api.MakeRoleParmSinginture("Role", "Role to edit", true),
-		api.MakeBoolParmSinginture("ViewChannels", "Check discord permissions list", true),
-		api.MakeBoolParmSinginture("ManageChannels", "Check discord permissions list", true),
-		api.MakeBoolParmSinginture("ManageRoles", "Check discord permissions list", true),
-		api.MakeBoolParmSinginture("ManageEmojis", "Check discord permissions list", true),
-		api.MakeBoolParmSinginture("ViewAuditLog", "Check discord permissions list", true),
-		api.MakeBoolParmSinginture("ManageWebhooks", "Check discord permissions list", true),
-		api.MakeBoolParmSinginture("ManageServer", "Check discord permissions list", true),
-		api.MakeBoolParmSinginture("Administrator", "Check discord permissions list", true),
+		api.MakeRoleParmSignature("Role", "Role to edit", true),
+		api.MakeBoolParmSignature("ViewChannels", "Check discord permissions list", true),
+		api.MakeBoolParmSignature("ManageChannels", "Check discord permissions list", true),
+		api.MakeBoolParmSignature("ManageRoles", "Check discord permissions list", true),
+		api.MakeBoolParmSignature("ManageEmojis", "Check discord permissions list", true),
+		api.MakeBoolParmSignature("ViewAuditLog", "Check discord permissions list", true),
+		api.MakeBoolParmSignature("ManageWebhooks", "Check discord permissions list", true),
+		api.MakeBoolParmSignature("ManageServer", "Check discord permissions list", true),
+		api.MakeBoolParmSignature("Administrator", "Check discord permissions list", true),
 	)
 }
 
@@ -183,15 +183,15 @@ func (h *membershipPermissionsSetRoleHandler) Callback(i api.SubcommandInvocatio
 	role.CommitPermissions()
 }
 
-func (h *membershipPermissionsSetRoleHandler) Regester(c api.Connection) api.SubcommandSinginture {
-	return api.MakeSubcommandSinginture(
+func (h *membershipPermissionsSetRoleHandler) Regester(c api.Connection) api.SubcommandSignature {
+	return api.MakeSubcommandSignature(
 		"membership-permissions-set", "Sets membership permissions for a role",
-		api.MakeRoleParmSinginture("Role", "Role to edit", true),
-		api.MakeBoolParmSinginture("CreateInvite", "Check discord permissions list", true),
-		api.MakeBoolParmSinginture("ChangeNicknames", "Check discord permissions list", true),
-		api.MakeBoolParmSinginture("ManageNicknames", "Check discord permissions list", true),
-		api.MakeBoolParmSinginture("KickMembers", "Check discord permissions list", true),
-		api.MakeBoolParmSinginture("BanMembers", "Check discord permissions list", true),
+		api.MakeRoleParmSignature("Role", "Role to edit", true),
+		api.MakeBoolParmSignature("CreateInvite", "Check discord permissions list", true),
+		api.MakeBoolParmSignature("ChangeNicknames", "Check discord permissions list", true),
+		api.MakeBoolParmSignature("ManageNicknames", "Check discord permissions list", true),
+		api.MakeBoolParmSignature("KickMembers", "Check discord permissions list", true),
+		api.MakeBoolParmSignature("BanMembers", "Check discord permissions list", true),
 	)
 }
 
@@ -218,19 +218,19 @@ func (h *textPermissionsSetRoleHandler) Callback(i api.SubcommandInvocation, c a
 	role.CommitPermissions()
 }
 
-func (h *textPermissionsSetRoleHandler) Regester(c api.Connection) api.SubcommandSinginture {
-	return api.MakeSubcommandSinginture(
+func (h *textPermissionsSetRoleHandler) Regester(c api.Connection) api.SubcommandSignature {
+	return api.MakeSubcommandSignature(
 		"text-permissions-set", "Sets text permissions for a role",
-		api.MakeRoleParmSinginture("Role", "Role to edit", true),
-		api.MakeBoolParmSinginture("SendMessages", "Check discord permissions list", true),
-		api.MakeBoolParmSinginture("EmbedLinks", "Check discord permissions list", true),
-		api.MakeBoolParmSinginture("AttachFiles", "Check discord permissions list", true),
-		api.MakeBoolParmSinginture("AddReactions", "Check discord permissions list", true),
-		api.MakeBoolParmSinginture("UseExternalEmoji", "Check discord permissions list", true),
-		api.MakeBoolParmSinginture("MentionAllRoles", "Check discord permissions list", true),
-		api.MakeBoolParmSinginture("ManageMessages", "Check discord permissions list", true),
-		api.MakeBoolParmSinginture("ReadMessageHistory", "Check discord permissions list", true),
-		api.MakeBoolParmSinginture("SendTTSMessages", "Check discord permissions list", true),
+		api.MakeRoleParmSignature("Role", "Role to edit", true),
+		api.MakeBoolParmSignature("SendMessages", "Check discord permissions list", true),
+		api.MakeBoolParmSignature("EmbedLinks", "Check discord permissions list", true),
+		api.MakeBoolParmSignature("AttachFiles", "Check discord permissions list", true),
+		api.MakeBoolParmSignature("AddReactions", "Check discord permissions list", true),
+		api.MakeBoolParmSignature("UseExternalEmoji", "Check discord permissions list", true),
+		api.MakeBoolParmSignature("MentionAllRoles", "Check discord permissions list", true),
+		api.MakeBoolParmSignature("ManageMessages", "Check discord permissions list", true),
+		api.MakeBoolParmSignature("ReadMessageHistory", "Check discord permissions list", true),
+		api.MakeBoolParmSignature("SendTTSMessages", "Check discord permissions list", true),
 	)
 }
 
@@ -255,16 +255,16 @@ func (h *voicePermissionsSetRoleHandler) Callback(i api.SubcommandInvocation, c 
 	role.CommitPermissions()
 }
 
-func (h *voicePermissionsSetRoleHandler) Regester(c api.Connection) api.SubcommandSinginture {
-	return api.MakeSubcommandSinginture(
+func (h *voicePermissionsSetRoleHandler) Regester(c api.Connection) api.SubcommandSignature {
+	return api.MakeSubcommandSignature(
 		"voice-permissions-set", "Sets voice permissions for a role",
-		api.MakeRoleParmSinginture("Role", "Role to edit", true),
-		api.MakeBoolParmSinginture("Connect", "Check discord permissions list", true),
-		api.MakeBoolParmSinginture("Speek", "Check discord permissions list", true),
-		api.MakeBoolParmSinginture("UseVoiceActivity", "Check discord permissions list", true),
-		api.MakeBoolParmSinginture("PrioritySpeeker", "Check discord permissions list", true),
-		api.MakeBoolParmSinginture("MuteMembers", "Check discord permissions list", true),
-		api.MakeBoolParmSinginture("DeafenMembers", "Check discord permissions list", true),
-		api.MakeBoolParmSinginture("MoveMembers", "Check discord permissions list", true),
+		api.MakeRoleParmSignature("Role", "Role to edit", true),
+		api.MakeBoolParmSignature("Connect", "Check discord permissions list", true),
+		api.MakeBoolParmSignature("Speak", "Check discord permissions list", true),
+		api.MakeBoolParmSignature("UseVoiceActivity", "Check discord permissions list", true),
+		api.MakeBoolParmSignature("PrioritySpeaker", "Check discord permissions list", true),
+		api.MakeBoolParmSignature("MuteMembers", "Check discord permissions list", true),
+		api.MakeBoolParmSignature("DeafenMembers", "Check discord permissions list", true),
+		api.MakeBoolParmSignature("MoveMembers", "Check discord permissions list", true),
 	)
 }

@@ -19,10 +19,10 @@ func (h *WarnHandler) Callback(i api.StandaloneCommandInvocation, c api.Connecti
 	channel.SendEmbedMessage(user.Mention() + " This is you final warning for " + i.GetStringParm(1))
 }
 
-func (h *WarnHandler) Regester(c api.Connection) api.StandaloneCommandSinginture {
-	return api.MakeStandaloneCommandSinginture("warn", "Warn for user rule violation",
-		api.MakeUserParmSinginture("User", "User to warn", true),
-		api.MakeParmSingintureWithChoices("Violation", "Rule violated", true,
+func (h *WarnHandler) Regester(c api.Connection) api.StandaloneCommandSignature {
+	return api.MakeStandaloneCommandSignature("warn", "Warn for user rule violation",
+		api.MakeUserParmSignature("User", "User to warn", true),
+		api.MakeParmSignatureWithChoices("Violation", "Rule violated", true,
 			api.Choice{Name: "Gore", Value: "Gore"},
 			api.Choice{Name: "Harassment", Value: "Harassment"},
 			api.Choice{Name: "Disrespecting staff", Value: "Disrespecting staff"},
